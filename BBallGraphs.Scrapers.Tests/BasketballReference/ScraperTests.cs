@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Scrapers.UnitTests.BasketballReference
+namespace BBallGraphs.Scrapers.Tests.BasketballReference
 {
     [TestClass]
     public class ScraperTests
