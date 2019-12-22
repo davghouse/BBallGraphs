@@ -2,30 +2,51 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BBallGraphs.Syncer.Rows
 {
-    public class PlayerFeedRow : TableEntity
+    public class PlayerFeedRow : TableEntity, IPlayerFeed
     {
         public string Url { get; set; }
-        public DateTime? LastSyncedTimeUtc { get; set; }
+        public DateTime? LastSyncTimeUtc { get; set; }
+        public DateTime? LastSyncWithChangesTimeUtc { get; set; }
 
-        public static IEnumerable<PlayerFeedRow> CreateRows(IEnumerable<PlayerFeed> playerFeeds)
+        public static PlayerFeedRow CreateRow(IPlayerFeed playerFeed, DateTime rowKeyTimeUtc)
+        {
+            var playerFeedRow = new PlayerFeedRow
+            {
+                PartitionKey = "0",
+                RowKey = GetRowKey(rowKeyTimeUtc),
+            };
+            playerFeed.CopyTo(playerFeedRow);
+
+            return playerFeedRow;
+        }
+
+        public static IEnumerable<PlayerFeedRow> CreateRows(IEnumerable<IPlayerFeed> playerFeeds)
         {
             DateTime utcNow = DateTime.UtcNow;
             int rowKeyDeduplicator = 0;
 
-            foreach (var playerFeed in playerFeeds)
-                yield return new PlayerFeedRow
-                {
-                    PartitionKey = "0",
-                    RowKey = GetRowKey(utcNow.AddTicks(rowKeyDeduplicator++)),
-
-                    Url = playerFeed.Url
-                };
+            return playerFeeds
+                .Select(f => CreateRow(f, utcNow.AddTicks(rowKeyDeduplicator++)));
         }
 
-        public static string GetRowKey(DateTime dateTimeUtc)
-            => dateTimeUtc.Ticks.ToString("D19");
+        public PlayerFeedRow CreateRequeuedRow(DateTime syncTimeUtc, bool syncFoundChanges)
+        {
+            var requeuedPlayerFeedRow = CreateRow(this, syncTimeUtc);
+            requeuedPlayerFeedRow.LastSyncTimeUtc = syncTimeUtc;
+            requeuedPlayerFeedRow.LastSyncWithChangesTimeUtc = syncFoundChanges ? syncTimeUtc
+                : LastSyncWithChangesTimeUtc;
+
+            return requeuedPlayerFeedRow;
+        }
+
+        public static string GetRowKey(DateTime rowKeyTimeUtc)
+            => rowKeyTimeUtc.Ticks.ToString("D19");
+
+        public override string ToString()
+            => Url;
     }
 }

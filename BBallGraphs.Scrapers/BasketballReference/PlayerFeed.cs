@@ -1,11 +1,8 @@
 ﻿namespace BBallGraphs.Scrapers.BasketballReference
 {
-    public class PlayerFeed
+    public class PlayerFeed : IPlayerFeed
     {
-        public PlayerFeed(string url)
-            => Url = url;
-
-        public string Url { get; }
+        public string Url { get; set; }
 
         public override string ToString()
             => Url;

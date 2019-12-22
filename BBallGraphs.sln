@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Scrapers.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Syncer", "BBallGraphs.Syncer\BBallGraphs.Syncer.csproj", "{1E1554D9-F4B1-478A-8700-482865385A43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBallGraphs.Syncer.Tests", "BBallGraphs.Syncer.Tests\BBallGraphs.Syncer.Tests.csproj", "{B627D642-4227-46EE-B9AF-6046B168BEFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Syncer.Tests", "BBallGraphs.Syncer.Tests\BBallGraphs.Syncer.Tests.csproj", "{B627D642-4227-46EE-B9AF-6046B168BEFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

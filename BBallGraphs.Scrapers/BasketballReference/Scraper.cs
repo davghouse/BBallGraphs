@@ -31,7 +31,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 var playerFeeds = playerFeedsDocument
                     .QuerySelectorAll("ul.page_index li > a")
                     .OfType<IHtmlAnchorElement>()
-                    .Select(a => new PlayerFeed(url: a.Href.Trim()))
+                    .Select(a => new PlayerFeed { Url = a.Href.Trim() })
                     .ToArray();
 
                 // The /x/ feed doesn't exist at the time of writing. Any other change to the feeds
@@ -46,7 +46,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
             }
         }
 
-        public static async Task<IReadOnlyList<Player>> GetPlayers(PlayerFeed playerFeed)
+        public static async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
         {
             var browsingContext = GetBrowsingContext();
 
@@ -63,17 +63,20 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 var players = playerFeedDocument
                     .QuerySelectorAll("table.stats_table tbody tr:not(.thead)")
                     .Select(e => e.Children)
-                    .Select(c => new Player(
-                        url: getPlayerUrlAndName(c[0]).url,
-                        name: getPlayerUrlAndName(c[0]).name,
-                        fromYear: int.Parse(c[1].TextContent),
-                        toYear: int.Parse(c[2].TextContent),
-                        position: c[3].TextContent.Trim(),
-                        heightInches: ScrapeHelper.ParseHeight(c[4].TextContent),
-                        weightPounds: double.TryParse(c[5].TextContent, out double weightPounds)
+                    .Select(c => new Player
+                    {
+                        Url = getPlayerUrlAndName(c[0]).url,
+                        Name = getPlayerUrlAndName(c[0]).name,
+                        FromYear = int.Parse(c[1].TextContent),
+                        ToYear = int.Parse(c[2].TextContent),
+                        Position = c[3].TextContent.Trim(),
+                        HeightInches = ScrapeHelper.ParseHeight(c[4].TextContent),
+                        WeightPounds = double.TryParse(c[5].TextContent, out double weightPounds)
                             ? weightPounds : (double?)null,
-                        birthDate: DateTime.TryParse(c[6].TextContent, out DateTime birthDate)
-                            ? birthDate : ScrapeHelper.GetEstimatedBirthDate(getPlayerUrlAndName(c[0]).name)))
+                        BirthDate = DateTime.TryParse(c[6].TextContent, out DateTime birthDate)
+                            ? birthDate.AsUtc() : ScrapeHelper.GetEstimatedBirthDate(getPlayerUrlAndName(c[0]).name),
+                        FeedUrl = playerFeed.Url
+                    })
                     .ToArray();
 
                 if (players.Length == 0
