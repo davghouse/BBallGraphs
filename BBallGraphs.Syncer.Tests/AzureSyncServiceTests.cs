@@ -97,7 +97,7 @@ namespace BBallGraphs.Syncer.Tests
                 .SelectMany(i => Enumerable.Range(1, 5)
                     .Select(j => new Player
                     {
-                        Url = $"{i}-{j}",
+                        ID = $"{i}-{j}",
                         Name = $"{i}-{j}",
                         BirthDate = DateTime.UtcNow,
                         FeedUrl = playerFeeds[i - 1].Url,
@@ -110,21 +110,21 @@ namespace BBallGraphs.Syncer.Tests
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "1-1", "1-2", "1-3", "1-4", "1-5" },
-                playerRows.Select(r => r.Url).ToArray());
+                playerRows.Select(r => r.ID).ToArray());
 
             playerRows = await _syncService.GetPlayerRows(playerFeeds[1]);
 
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "2-1", "2-2", "2-3", "2-4", "2-5" },
-                playerRows.Select(r => r.Url).ToArray());
+                playerRows.Select(r => r.ID).ToArray());
 
             playerRows = await _syncService.GetPlayerRows(playerFeeds[49]);
 
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "50-1", "50-2", "50-3", "50-4", "50-5" },
-                playerRows.Select(r => r.Url).ToArray());
+                playerRows.Select(r => r.ID).ToArray());
 
             playerRows = await _syncService.GetPlayerRows(new PlayerFeed { Url = "51" });
             Assert.AreEqual(0, playerRows.Count);
@@ -170,7 +170,7 @@ namespace BBallGraphs.Syncer.Tests
                 .SelectMany(i => Enumerable.Range(1, 5)
                     .Select(j => new Player
                     {
-                        Url = $"{i}-{j}",
+                        ID = $"{i}-{j}",
                         Name = $"{i}-{j}",
                         BirthDate = DateTime.UtcNow,
                         FeedUrl = playerFeeds[i - 1].Url,
@@ -185,16 +185,16 @@ namespace BBallGraphs.Syncer.Tests
 
             var updatedPlayersFeed1 = playerRowsFeed1.Select(r => new Player
             {
-                Url = r.Url,
+                ID = r.ID,
                 Name = r.Name + "-updated",
-                FromYear = r.FromYear + 1,
-                ToYear = r.ToYear + 1,
+                FirstSeason = r.FirstSeason + 1,
+                LastSeason = r.LastSeason + 1,
                 BirthDate = r.BirthDate.AddYears(1),
                 FeedUrl = r.FeedUrl,
             }).Concat(Enumerable.Range(6, 5)
                 .Select(i => new Player
                 {
-                    Url = $"1-{i}",
+                    ID = $"1-{i}",
                     Name = $"1-{i}",
                     BirthDate = DateTime.UtcNow,
                     FeedUrl = playerFeeds[0].Url,
@@ -224,14 +224,14 @@ namespace BBallGraphs.Syncer.Tests
 
             var updatedPlayersFeed5 = playerRowsFeed5.Select(r => new Player
             {
-                Url = r.Url,
+                ID = r.ID,
                 Name = r.Name,
                 BirthDate = r.BirthDate,
                 FeedUrl = r.FeedUrl,
             }).Concat(Enumerable.Range(6, 1)
                 .Select(i => new Player
                 {
-                    Url = $"5-{i}",
+                    ID = $"5-{i}",
                     Name = $"5-{i}",
                     BirthDate = DateTime.UtcNow,
                     FeedUrl = playerFeeds[4].Url,

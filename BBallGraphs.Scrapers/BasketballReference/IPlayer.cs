@@ -4,41 +4,47 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public interface IPlayer
     {
-        string Url { get; set; }
-        string Name { get; set; }
-        int FromYear { get; set; }
-        int ToYear { get; set; }
-        string Position { get; set; }
-        double HeightInches { get; set; }
-        double? WeightPounds { get; set; }
-        DateTime BirthDate { get; set; }
         string FeedUrl { get; set; }
+        string ID { get; set; }
+        string Name { get; set; }
+        int FirstSeason { get; set; }
+        int LastSeason { get; set; }
+        string Position { get; set; }
+        double HeightInInches { get; set; }
+        double? WeightInPounds { get; set; }
+        DateTime BirthDate { get; set; }
     }
 
     public static class IPlayerExtensions
     {
         public static bool Matches(this IPlayer player, IPlayer otherPlayer)
-            => player.Url == otherPlayer.Url
+            => player.FeedUrl == otherPlayer.FeedUrl
+            && player.ID == otherPlayer.ID
             && player.Name == otherPlayer.Name
-            && player.FromYear == otherPlayer.FromYear
-            && player.ToYear == otherPlayer.ToYear
+            && player.FirstSeason == otherPlayer.FirstSeason
+            && player.LastSeason == otherPlayer.LastSeason
             && player.Position == otherPlayer.Position
-            && player.HeightInches == otherPlayer.HeightInches
-            && player.WeightPounds == otherPlayer.WeightPounds
-            && player.BirthDate == otherPlayer.BirthDate
-            && player.FeedUrl == otherPlayer.FeedUrl;
+            && player.HeightInInches == otherPlayer.HeightInInches
+            && player.WeightInPounds == otherPlayer.WeightInPounds
+            && player.BirthDate == otherPlayer.BirthDate;
 
         public static void CopyTo(this IPlayer sourcePlayer, IPlayer targetPlayer)
         {
-            targetPlayer.Url = sourcePlayer.Url;
-            targetPlayer.Name = sourcePlayer.Name;
-            targetPlayer.FromYear = sourcePlayer.FromYear;
-            targetPlayer.ToYear = sourcePlayer.ToYear;
-            targetPlayer.Position = sourcePlayer.Position;
-            targetPlayer.HeightInches = sourcePlayer.HeightInches;
-            targetPlayer.WeightPounds = sourcePlayer.WeightPounds;
-            targetPlayer.BirthDate = sourcePlayer.BirthDate;
             targetPlayer.FeedUrl = sourcePlayer.FeedUrl;
+            targetPlayer.ID = sourcePlayer.ID;
+            targetPlayer.Name = sourcePlayer.Name;
+            targetPlayer.FirstSeason = sourcePlayer.FirstSeason;
+            targetPlayer.LastSeason = sourcePlayer.LastSeason;
+            targetPlayer.Position = sourcePlayer.Position;
+            targetPlayer.HeightInInches = sourcePlayer.HeightInInches;
+            targetPlayer.WeightInPounds = sourcePlayer.WeightInPounds;
+            targetPlayer.BirthDate = sourcePlayer.BirthDate;
         }
+
+        public static string GetProfileUrl(this IPlayer player)
+            => $"{player.FeedUrl}{player.ID}.html";
+
+        public static string GetGameLogUrl(this IPlayer player, int season)
+            => $"{player.FeedUrl}{player.ID}/gamelog/{season}/";
     }
 }

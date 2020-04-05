@@ -19,7 +19,7 @@ namespace BBallGraphs.Syncer
             var syncService = new AzureSyncService();
 
             var playerFeedRow = (await syncService.GetNextPlayerFeedRows(
-                rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromDays(1)))
+                rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
             log.LogInformation("Queried player feeds table for next feed: " +
                 $"{playerFeedRow?.Url ?? "N/A"}.");
@@ -37,13 +37,13 @@ namespace BBallGraphs.Syncer
             // Ron Artest moving to /w/), but let's manually verify each occurrence like that.
             if (syncResult.DefunctPlayerRows.Any())
                 throw new SyncException("Defunct player rows found, manual intervention required: " +
-                    $"{string.Join(", ", syncResult.DefunctPlayerRows.Select(r => r.Url))}", playerFeedRow.Url);
+                    $"{string.Join(", ", syncResult.DefunctPlayerRows.Select(r => r.ID))}", playerFeedRow.Url);
 
             log.LogInformation(syncResult.NewPlayers.Any()
-                ? $"New players found: {string.Join(", ", syncResult.NewPlayers.Select(p => p.Url))}"
+                ? $"New players found: {string.Join(", ", syncResult.NewPlayers.Select(p => p.ID))}"
                 : "No new players found.");
             log.LogInformation(syncResult.UpdatedPlayerRows.Any()
-                ? $"Updated players found: {string.Join(", ", syncResult.UpdatedPlayerRows.Select(r => r.Url))}"
+                ? $"Updated players found: {string.Join(", ", syncResult.UpdatedPlayerRows.Select(r => r.ID))}"
                 : "No updated players found.");
 
             if (syncResult.FoundChanges)

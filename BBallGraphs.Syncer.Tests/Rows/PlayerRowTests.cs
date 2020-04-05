@@ -15,41 +15,42 @@ namespace BBallGraphs.Syncer.Tests.Rows
         {
             var player = new Player
             {
-                Url = "https://www.basketball-reference.com/players/j/jamesle01.html",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                ID = "jamesle01",
                 Name = "LeBron James",
-                FromYear = 2004,
-                ToYear = 2020,
+                FirstSeason = 2004,
+                LastSeason = 2020,
                 Position = "F-G",
-                HeightInches = 81,
-                WeightPounds = 250,
+                HeightInInches = 81,
+                WeightInPounds = 250,
                 BirthDate = new DateTime(1984, 12, 30).AsUtc(),
-                FeedUrl = "https://www.basketball-reference.com/players/j/"
             };
             var playerRow = PlayerRow.CreateRow(player, DateTime.UtcNow);
 
             Assert.AreEqual("0", playerRow.PartitionKey);
-            Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01.html", playerRow.Url);
-            Assert.AreEqual("LeBron James", playerRow.Name);
-            Assert.AreEqual(2004, playerRow.FromYear);
-            Assert.AreEqual(2020, playerRow.ToYear);
-            Assert.AreEqual("F-G", playerRow.Position);
-            Assert.AreEqual(81, playerRow.HeightInches);
-            Assert.AreEqual(250, playerRow.WeightPounds);
-            Assert.AreEqual(new DateTime(1984, 12, 30).AsUtc(), playerRow.BirthDate);
             Assert.AreEqual("https://www.basketball-reference.com/players/j/", playerRow.FeedUrl);
+            Assert.AreEqual("jamesle01", playerRow.ID);
+            Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01.html", playerRow.GetProfileUrl());
+            Assert.AreEqual("LeBron James", playerRow.Name);
+            Assert.AreEqual(2004, playerRow.FirstSeason);
+            Assert.AreEqual(2020, playerRow.LastSeason);
+            Assert.AreEqual("F-G", playerRow.Position);
+            Assert.AreEqual(81, playerRow.HeightInInches);
+            Assert.AreEqual(250, playerRow.WeightInPounds);
+            Assert.AreEqual(new DateTime(1984, 12, 30).AsUtc(), playerRow.BirthDate);
         }
 
         [TestMethod]
         public void CreateRows()
         {
             var players = Enumerable.Range(0, 50)
-                .Select(i => new Player { Url = i.ToString(), Name = $"player {i}" });
+                .Select(i => new Player { ID = i.ToString(), Name = $"player {i}" });
             var playerRows = PlayerRow.CreateRows(players).ToArray();
 
             Assert.AreEqual(50, playerRows.Length);
             CollectionAssert.AreEqual(
-                players.Select(f => f.Url).ToArray(),
-                playerRows.Select(r => r.Url).ToArray());
+                players.Select(f => f.ID).ToArray(),
+                playerRows.Select(r => r.ID).ToArray());
             Assert.IsTrue(playerRows.All(r => r.PartitionKey == "0"));
             Assert.AreEqual(playerRows.Length, playerRows.Select(r => r.RowKey).Distinct().Count());
         }

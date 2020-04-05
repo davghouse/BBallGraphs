@@ -8,24 +8,24 @@ namespace BBallGraphs.Scrapers.Tests.Helpers
     public class ScrapeHelperTests
     {
         [TestMethod]
-        public void ParseHeight()
+        public void ParseHeightInInches()
         {
-            Assert.AreEqual(72, ScrapeHelper.ParseHeight("6-0"));
-            Assert.AreEqual(84, ScrapeHelper.ParseHeight("7-0"));
-            Assert.AreEqual(75, ScrapeHelper.ParseHeight("6-3"));
-            Assert.AreEqual(85.5, ScrapeHelper.ParseHeight("7-1.5"));
-            Assert.AreEqual(60, ScrapeHelper.ParseHeight("5 - 0"));
+            Assert.AreEqual(72, ScrapeHelper.ParseHeightInInches("6-0"));
+            Assert.AreEqual(84, ScrapeHelper.ParseHeightInInches("7-0"));
+            Assert.AreEqual(75, ScrapeHelper.ParseHeightInInches("6-3"));
+            Assert.AreEqual(85.5, ScrapeHelper.ParseHeightInInches("7-1.5"));
+            Assert.AreEqual(60, ScrapeHelper.ParseHeightInInches("5 - 0"));
         }
 
         [TestMethod]
-        public void AsUtc()
+        public void ParseSecondsPlayed()
         {
-            var nowLocal = DateTime.Now;
-            var nowUtc = nowLocal.ToUniversalTime();
-
-            Assert.AreEqual(nowLocal.TimeOfDay, nowLocal.AsUtc().TimeOfDay);
-            Assert.AreEqual(nowUtc.TimeOfDay, nowUtc.AsUtc().TimeOfDay);
-            Assert.AreEqual(DateTimeKind.Utc, nowLocal.AsUtc().Kind);
+            Assert.AreEqual(37*60, ScrapeHelper.ParseSecondsPlayed("37:00"));
+            Assert.AreEqual(33*60 + 3, ScrapeHelper.ParseSecondsPlayed("33:03"));
+            Assert.AreEqual(42*60 + 50, ScrapeHelper.ParseSecondsPlayed("42:50"));
+            Assert.AreEqual(null, ScrapeHelper.ParseSecondsPlayed(null));
+            Assert.AreEqual(null, ScrapeHelper.ParseSecondsPlayed(""));
+            Assert.AreEqual(null, ScrapeHelper.ParseSecondsPlayed("  "));
         }
 
         [TestMethod]

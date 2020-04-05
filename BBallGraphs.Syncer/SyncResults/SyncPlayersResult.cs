@@ -11,20 +11,20 @@ namespace BBallGraphs.Syncer.SyncResults
             IEnumerable<PlayerRow> playerRows,
             IEnumerable<Player> players)
         {
-            var playerRowsDict = playerRows.ToDictionary(r => r.Url);
-            var playersDict = players.ToDictionary(p => p.Url);
+            var playerRowsDict = playerRows.ToDictionary(r => r.ID);
+            var playersDict = players.ToDictionary(p => p.ID);
 
             DefunctPlayerRows = playerRowsDict.Values
-                .Where(r => !playersDict.ContainsKey(r.Url))
+                .Where(r => !playersDict.ContainsKey(r.ID))
                 .ToArray();
             NewPlayers = playersDict.Values
-                .Where(p => !playerRowsDict.ContainsKey(p.Url))
+                .Where(p => !playerRowsDict.ContainsKey(p.ID))
                 .ToArray();
 
             var updatedPlayerRows = new List<PlayerRow>();
             foreach (var player in playersDict.Values)
             {
-                if (playerRowsDict.TryGetValue(player.Url, out PlayerRow playerRow)
+                if (playerRowsDict.TryGetValue(player.ID, out PlayerRow playerRow)
                     && !player.Matches(playerRow))
                 {
                     player.CopyTo(playerRow);

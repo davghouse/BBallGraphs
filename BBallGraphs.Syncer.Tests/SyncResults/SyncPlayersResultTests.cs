@@ -13,24 +13,24 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         public void FindsChanges()
         {
             var playerRows = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new PlayerRow { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new PlayerRow { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var players = new[] { (0, 100), (1, 101), (3, 300), (5, 500), (6, 106) }
-                .Select(i => new Player { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new Player { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var syncResult = new SyncPlayersResult(playerRows, players);
 
             CollectionAssert.AreEquivalent(
-                playerRows.Where(r => r.Url == "2" || r.Url == "4").ToArray(),
+                playerRows.Where(r => r.ID == "2" || r.ID == "4").ToArray(),
                 syncResult.DefunctPlayerRows.ToArray());
             CollectionAssert.AreEquivalent(
-                players.Where(p => p.Url == "0" || p.Url == "6").ToArray(),
+                players.Where(p => p.ID == "0" || p.ID == "6").ToArray(),
                 syncResult.NewPlayers.ToArray());
             CollectionAssert.AreEquivalent(
-                playerRows.Where(p => p.Url == "3" || p.Url == "5").ToArray(),
+                playerRows.Where(p => p.ID == "3" || p.ID == "5").ToArray(),
                 syncResult.UpdatedPlayerRows.ToArray());
             CollectionAssert.AreEqual(
-                new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.Url).ToArray());
+                new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.ID).ToArray());
             CollectionAssert.AreEqual(
                 new[] { "101", "102", "300", "104", "500" }, playerRows.Select(r => r.Name).ToArray());
             Assert.IsTrue(syncResult.FoundChanges);
@@ -40,10 +40,10 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         public void DoesntFindChanges()
         {
             var playerRows = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new PlayerRow { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new PlayerRow { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var players = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new Player { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new Player { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var syncResult = new SyncPlayersResult(playerRows, players);
 
@@ -57,7 +57,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         public void FindsChangesWhenAllDefunct()
         {
             var playerRows = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new PlayerRow { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new PlayerRow { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var syncResult = new SyncPlayersResult(playerRows, Enumerable.Empty<Player>());
 
@@ -71,7 +71,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         public void FindsChangesWhenAllNew()
         {
             var players = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new Player { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new Player { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var syncResult = new SyncPlayersResult(Enumerable.Empty<PlayerRow>(), players);
 
@@ -85,10 +85,10 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         public void FindsChangesWhenAllUpdated()
         {
             var playerRows = new[] { (1, 101), (2, 102), (3, 103), (4, 104), (5, 105) }
-                .Select(i => new PlayerRow { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new PlayerRow { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var players = new[] { (1, 1001), (2, 1002), (3, 1003), (4, 1004), (5, 1005) }
-                .Select(i => new Player { Url = i.Item1.ToString(), Name = i.Item2.ToString() })
+                .Select(i => new Player { ID = i.Item1.ToString(), Name = i.Item2.ToString() })
                 .ToArray();
             var syncResult = new SyncPlayersResult(playerRows, players);
 
@@ -96,7 +96,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
             Assert.AreEqual(0, syncResult.NewPlayers.Count);
             CollectionAssert.AreEquivalent(playerRows, syncResult.UpdatedPlayerRows.ToArray());
             CollectionAssert.AreEqual(
-                new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.Url).ToArray());
+                new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.ID).ToArray());
             CollectionAssert.AreEqual(
                 new[] { "1001", "1002", "1003", "1004", "1005" }, playerRows.Select(r => r.Name).ToArray());
             Assert.IsTrue(playerRows.Zip(players, (r, p) => r.Matches(p)).All(m => m));
