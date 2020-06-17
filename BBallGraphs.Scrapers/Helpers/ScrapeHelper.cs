@@ -45,7 +45,7 @@ namespace BBallGraphs.Scrapers.Helpers
                 case "Rich Dumas": return new DateTime(1945, 1, 1).AsUtc();
                 case "Mack Daughtry": return new DateTime(1947, 1, 1).AsUtc();
                 case "Darrell Hardy": return new DateTime(1944, 1, 1).AsUtc();
-                case "Wilber Kirkland": return new DateTime(1947, 1, 1).AsUtc();
+                case "Wilbur Kirkland": return new DateTime(1947, 1, 1).AsUtc();
                 case "R.B. Lynam": return new DateTime(1944, 1, 1).AsUtc();
                 case "Dick Lee": return new DateTime(1938, 1, 1).AsUtc();
                 case "Richard Moore": return new DateTime(1945, 1, 1).AsUtc();
