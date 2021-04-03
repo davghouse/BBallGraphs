@@ -114,5 +114,36 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01.html", player.GetProfileUrl());
             Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01/gamelog/2007/", player.GetGameLogUrl(2007));
         }
+
+        [TestMethod]
+        public void IsProbablyRetired()
+        {
+            var player = new Player
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/t/",
+                ID = "testte01",
+                Name = "test test",
+                FirstSeason = 2000,
+                Position = "F-G",
+                HeightInInches = 81,
+                WeightInPounds = 250,
+                BirthDate = new DateTime(1984, 12, 30).AsUtc(),
+            };
+
+            player.LastSeason = DateTime.UtcNow.Year;
+            Assert.IsFalse(player.IsProbablyRetired());
+
+            player.LastSeason = DateTime.UtcNow.Year - 1;
+            Assert.IsFalse(player.IsProbablyRetired());
+
+            player.LastSeason = DateTime.UtcNow.Year + 1;
+            Assert.IsFalse(player.IsProbablyRetired());
+
+            player.LastSeason = DateTime.UtcNow.Year - 5;
+            Assert.IsFalse(player.IsProbablyRetired());
+
+            player.LastSeason = DateTime.UtcNow.Year - 6;
+            Assert.IsTrue(player.IsProbablyRetired());
+        }
     }
 }

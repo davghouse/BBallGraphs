@@ -46,5 +46,9 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public static string GetGameLogUrl(this IPlayer player, int season)
             => $"{player.FeedUrl}{player.ID}/gamelog/{season}/";
+
+        // Not sure best duration to pick, but a year or two isn't enough (big injury, taking a break, playing overseas).
+        public static bool IsProbablyRetired(this IPlayer player)
+            => player.LastSeason + 5 < DateTime.UtcNow.Year;
     }
 }

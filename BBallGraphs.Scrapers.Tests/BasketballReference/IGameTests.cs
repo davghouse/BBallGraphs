@@ -19,6 +19,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(2003, 10, 29).AsUtc(),
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200310290SAC.html",
+                ID = "jamesle01 10/29/2003",
                 AgeInDays = 6877,
                 Won = false,
                 Started = true,
@@ -50,6 +51,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(2003, 11, 05).AsUtc(),
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200311050CLE.html",
+                ID = "jamesle01 11/5/2003",
                 AgeInDays = 6884,
                 Won = false,
                 Started = true,
@@ -78,6 +80,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.IsFalse(game2.Matches(game1));
 
             game2.Date = new DateTime(2003, 10, 29).AsUtc();
+            game2.ID = "jamesle01 10/29/2003";
 
             Assert.IsFalse(game1.Matches(game2));
 

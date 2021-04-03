@@ -12,7 +12,7 @@ namespace BBallGraphs.Syncer
     {
         [FunctionName(nameof(SyncPlayers))]
         public static async Task Run(
-            // Every 4 minutes, between 06:00 PM and 07:59 PM every day.
+            // Every 4 minutes, between 6:00 PM and 7:59 PM every day.
             [TimerTrigger("0 */4 18-19 * * *")]TimerInfo timer,
             ILogger log)
         {
@@ -22,7 +22,7 @@ namespace BBallGraphs.Syncer
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
             log.LogInformation("Queried player feeds table for next feed: " +
-                $"{playerFeedRow?.Url ?? "N/A"}.");
+                $"{playerFeedRow?.ToString() ?? "N/A"}.");
             if (playerFeedRow == null) return;
 
             var playerRows = await syncService.GetPlayerRows(playerFeedRow);
@@ -33,8 +33,6 @@ namespace BBallGraphs.Syncer
 
             var syncResult = new SyncPlayersResult(playerRows, players);
 
-            // We don't expect players to disappear from feeds. It can happen legitimately (like
-            // Ron Artest moving to /w/), but let's manually verify each occurrence like that.
             if (syncResult.DefunctPlayerRows.Any())
                 throw new SyncException("Defunct player rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctPlayerRows.Select(r => r.ID))}", playerFeedRow.Url);

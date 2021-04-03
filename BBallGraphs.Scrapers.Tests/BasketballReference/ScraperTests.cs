@@ -65,6 +65,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(2003, 10, 29).AsUtc(),
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200310290SAC.html",
+                ID = "jamesle01 10/29/2003",
                 AgeInDays = 6877,
                 Won = false,
                 Started = true,
@@ -96,6 +97,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(2003, 11, 05).AsUtc(),
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200311050CLE.html",
+                ID = "jamesle01 11/5/2003",
                 AgeInDays = 6884,
                 Won = false,
                 Started = true,
@@ -213,6 +215,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(1948, 11, 03).AsUtc(),
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/194811030FTW.html",
+                ID = "braunca01 11/3/1948",
                 AgeInDays = 7710,
                 Won = true,
                 Started = null,
@@ -243,7 +246,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             // I'm gonna assume these discrepancies don't exist for modern players, so I won't worry about them.
             Assert.AreEqual(57, regularSeasonGames.Count());
             Assert.AreEqual(300, regularSeasonGames.NullableSum(g => g.FieldGoalsMade));
-            Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.FieldGoalsAttempted));
+            Assert.AreEqual(54, regularSeasonGames.NullableSum(g => g.FieldGoalsAttempted));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.ThreePointersMade));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.ThreePointersAttempted));
             Assert.AreEqual(213, regularSeasonGames.NullableSum(g => g.FreeThrowsMade));
@@ -251,11 +254,11 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.OffensiveRebounds));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.DefensiveRebounds));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.TotalRebounds));
-            Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Assists));
+            Assert.AreEqual(17, regularSeasonGames.NullableSum(g => g.Assists));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Steals));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Blocks));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Turnovers));
-            Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.PersonalFouls));
+            Assert.AreEqual(8, regularSeasonGames.NullableSum(g => g.PersonalFouls));
             Assert.AreEqual(813, regularSeasonGames.NullableSum(g => g.Points));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.GameScore));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.PlusMinus));
@@ -318,6 +321,36 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             Assert.AreEqual(0, regularSeasonGames.Count());
             Assert.AreEqual(0, playoffGames.Count());
+        }
+
+        [TestMethod]
+        public async Task GetGamesForAPlayerWhoPlayedForBothTeamsInTheSameGame()
+        {
+            var player = new Player
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/m/",
+                ID = "moneyer01",
+                Name = "Eric Money",
+                FirstSeason = 1975,
+                LastSeason = 1980,
+                BirthDate = new DateTime(1955, 2, 6).AsUtc()
+            };
+            var games = await Scraper.GetGames(player, 1979);
+            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
+            var playoffGames = games.Where(g => g.IsPlayoffGame);
+
+            Assert.AreEqual(69, regularSeasonGames.Count());
+            Assert.AreEqual(8, playoffGames.Count());
+
+            var mergedGameData = games.Single(g => g.Date == new DateTime(1978, 11, 8).AsUtc());
+
+            Assert.IsTrue(mergedGameData.Won);
+            Assert.IsTrue(mergedGameData.Started.Value);
+            Assert.AreEqual(27, mergedGameData.Points);
+            Assert.AreEqual(3, mergedGameData.TotalRebounds);
+            Assert.AreEqual(6, mergedGameData.Assists);
+            Assert.AreEqual(1, mergedGameData.FreeThrowsMade);
+            Assert.AreEqual(2, mergedGameData.FreeThrowsAttempted);
         }
     }
 }

@@ -54,5 +54,121 @@ namespace BBallGraphs.Syncer.Tests.Rows
             Assert.IsTrue(playerRows.All(r => r.PartitionKey == "0"));
             Assert.AreEqual(playerRows.Length, playerRows.Select(r => r.RowKey).Distinct().Count());
         }
+
+        [TestMethod]
+        public void GetNextSyncSeasonForActivePlayer()
+        {
+            var utcNow = DateTime.UtcNow;
+            var playerRow = new PlayerRow
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                ID = "testte01",
+                Name = "test test",
+                FirstSeason = utcNow.Year - 10,
+                LastSeason = utcNow.Year,
+            };
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+
+            playerRow.LastSyncSeason = playerRow.FirstSeason;
+            Assert.AreEqual(playerRow.FirstSeason + 1, playerRow.GetNextSyncSeason());
+
+            playerRow.LastSyncSeason = playerRow.LastSeason;
+            Assert.AreEqual(playerRow.LastSeason, playerRow.GetNextSyncSeason());
+        }
+
+        [TestMethod]
+        public void GetNextSyncSeasonForRetiredPlayer()
+        {
+            var playerRow = new PlayerRow
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                ID = "testte01",
+                Name = "test test",
+                FirstSeason = 2000,
+                LastSeason = 2010,
+            };
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+
+            playerRow.LastSyncSeason = playerRow.FirstSeason;
+            Assert.AreEqual(playerRow.FirstSeason + 1, playerRow.GetNextSyncSeason());
+
+            playerRow.LastSyncSeason = playerRow.LastSeason;
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+        }
+
+        [TestMethod]
+        public void CreateRequeuedRowForActivePlayer()
+        {
+            var utcNow = DateTime.UtcNow;
+            var player = new Player
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                ID = "testte01",
+                Name = "test test",
+                FirstSeason = utcNow.Year - 10,
+                LastSeason = utcNow.Year,
+            };
+            var playerRow = PlayerRow.CreateRow(player, utcNow);
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+            Assert.AreEqual(null, playerRow.LastSyncSeason);
+            Assert.AreEqual(null, playerRow.LastSyncTimeUtc);
+            Assert.AreEqual(null, playerRow.LastSyncWithChangesTimeUtc);
+            Assert.AreEqual(PlayerRow.GetRowKey(utcNow), playerRow.RowKey);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                playerRow = playerRow.CreateRequeuedRow(utcNow.AddTicks(i), playerRow.FirstSeason + i, syncFoundChanges: true);
+                Assert.AreEqual(playerRow.FirstSeason + i + 1, playerRow.GetNextSyncSeason());
+                Assert.AreEqual(playerRow.FirstSeason + i, playerRow.LastSyncSeason);
+                Assert.AreEqual(utcNow.AddTicks(i), playerRow.LastSyncTimeUtc);
+                Assert.AreEqual(utcNow.AddTicks(i), playerRow.LastSyncWithChangesTimeUtc);
+                Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(i)), playerRow.RowKey);
+            }
+
+            playerRow = playerRow.CreateRequeuedRow(utcNow.AddTicks(10), playerRow.FirstSeason + 10, syncFoundChanges: true);
+            Assert.AreEqual(playerRow.LastSeason, playerRow.GetNextSyncSeason());
+            Assert.AreEqual(playerRow.LastSeason, playerRow.LastSyncSeason);
+            Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncTimeUtc);
+            Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncWithChangesTimeUtc);
+            Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(10)), playerRow.RowKey);
+        }
+
+        [TestMethod]
+        public void CreateRequeuedRowForRetiredPlayer()
+        {
+            var utcNow = DateTime.UtcNow;
+            var player = new Player
+            {
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                ID = "testte01",
+                Name = "test test",
+                FirstSeason = 2000,
+                LastSeason = 2010,
+            };
+            var playerRow = PlayerRow.CreateRow(player, utcNow);
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+            Assert.AreEqual(null, playerRow.LastSyncSeason);
+            Assert.AreEqual(null, playerRow.LastSyncTimeUtc);
+            Assert.AreEqual(null, playerRow.LastSyncWithChangesTimeUtc);
+            Assert.AreEqual(PlayerRow.GetRowKey(utcNow), playerRow.RowKey);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                playerRow = playerRow.CreateRequeuedRow(utcNow.AddTicks(i), playerRow.FirstSeason + i, syncFoundChanges: true);
+                Assert.AreEqual(playerRow.FirstSeason + i + 1, playerRow.GetNextSyncSeason());
+                Assert.AreEqual(playerRow.FirstSeason + i, playerRow.LastSyncSeason);
+                Assert.AreEqual(utcNow.AddTicks(i), playerRow.LastSyncTimeUtc);
+                Assert.AreEqual(utcNow.AddTicks(i), playerRow.LastSyncWithChangesTimeUtc);
+                Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(i)), playerRow.RowKey);
+            }
+
+            playerRow = playerRow.CreateRequeuedRow(utcNow.AddTicks(10), playerRow.FirstSeason + 10, syncFoundChanges: true);
+            Assert.AreEqual(playerRow.FirstSeason, playerRow.GetNextSyncSeason());
+            Assert.AreEqual(playerRow.LastSeason, playerRow.LastSyncSeason);
+            Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncTimeUtc);
+            Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncWithChangesTimeUtc);
+            // Deprioritized due to being retired.
+            Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(10).AddDays(365)), playerRow.RowKey);
+        }
     }
 }

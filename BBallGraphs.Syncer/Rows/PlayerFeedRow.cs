@@ -9,6 +9,7 @@ namespace BBallGraphs.Syncer.Rows
     public class PlayerFeedRow : TableEntity, IPlayerFeed
     {
         public string Url { get; set; }
+
         public DateTime? LastSyncTimeUtc { get; set; }
         public DateTime? LastSyncWithChangesTimeUtc { get; set; }
 
@@ -26,7 +27,7 @@ namespace BBallGraphs.Syncer.Rows
 
         public static IEnumerable<PlayerFeedRow> CreateRows(IEnumerable<IPlayerFeed> playerFeeds)
         {
-            DateTime utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow;
             int rowKeyDeduplicator = 0;
 
             return playerFeeds
@@ -37,8 +38,7 @@ namespace BBallGraphs.Syncer.Rows
         {
             var requeuedPlayerFeedRow = CreateRow(this, syncTimeUtc);
             requeuedPlayerFeedRow.LastSyncTimeUtc = syncTimeUtc;
-            requeuedPlayerFeedRow.LastSyncWithChangesTimeUtc = syncFoundChanges ? syncTimeUtc
-                : LastSyncWithChangesTimeUtc;
+            requeuedPlayerFeedRow.LastSyncWithChangesTimeUtc = syncFoundChanges ? syncTimeUtc : LastSyncWithChangesTimeUtc;
 
             return requeuedPlayerFeedRow;
         }

@@ -10,6 +10,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
         DateTime Date { get; set; }
         bool IsPlayoffGame { get; set; }
         string BoxScoreUrl { get; set; }
+        string ID { get; set; }
         int AgeInDays { get; set; }
         bool Won { get; set; }
         bool? Started { get; set; }
@@ -42,6 +43,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
             && game.Date == otherGame.Date
             && game.IsPlayoffGame == otherGame.IsPlayoffGame
             && game.BoxScoreUrl == otherGame.BoxScoreUrl
+            && game.ID == otherGame.ID
             && game.AgeInDays == otherGame.AgeInDays
             && game.Won == otherGame.Won
             && game.Started == otherGame.Started
@@ -72,6 +74,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
             targetGame.Date = sourceGame.Date;
             targetGame.IsPlayoffGame = sourceGame.IsPlayoffGame;
             targetGame.BoxScoreUrl = sourceGame.BoxScoreUrl;
+            targetGame.ID = sourceGame.ID;
             targetGame.AgeInDays = sourceGame.AgeInDays;
             targetGame.Won = sourceGame.Won;
             targetGame.Started = sourceGame.Started;

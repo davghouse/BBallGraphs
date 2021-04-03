@@ -159,9 +159,20 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         GameScore = NullableHelper.TryParseDouble(gameRowCells.GetStatCell("game_score")?.TextContent),
                         PlusMinus = NullableHelper.TryParseInt(gameRowCells.GetStatCell("plus_minus")?.TextContent)
                     };
+                    game.ID = $"{player.ID} {game.Date:d}";
                     game.AgeInDays = (int)(game.Date - player.BirthDate).TotalDays;
 
-                    games.Add(game);
+                    if (season == 1979
+                        && (player.ID == "moneyer01" || player.ID == "simpsra01" || player.ID == "catchha01")
+                        && game.Date == new DateTime(1978, 11, 8).AsUtc()
+                        && games.LastOrDefault()?.Date == new DateTime(1978, 11, 8).AsUtc())
+                    {
+                        games[games.Count - 1] = Game.MergeSplitGameData(games.Last(), game);
+                    }
+                    else
+                    {
+                        games.Add(game);
+                    }
                 }
 
                 if (games.Count > 110 /* 82 + 7*4, more are technically possible if traded but let's ignore that. */
@@ -171,7 +182,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         || g.Date < player.BirthDate
                         || g.Date < new DateTime(player.FirstSeason - 1, 1, 1)
                         || g.Date > new DateTime(player.LastSeason, 12, 31)
-                        || g.Points > 110 || g.Assists > 40 || g.TotalRebounds > 45)
+                        || g.Points > 110 || g.Assists > 40 || g.TotalRebounds > 45
+                        || g.Points < 0 || g.Assists < 0 || g.TotalRebounds < 0)
                     // Bill Russell never missed an entire regular season, or the playoffs. Use him as a canary to
                     // identify if we're missing games. Hard to do something better because of all the players that
                     // missed entire seasons and the playoffs--their game logs don't even have pgl_basic tables.

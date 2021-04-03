@@ -27,7 +27,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
                 players.Where(p => p.ID == "0" || p.ID == "6").ToArray(),
                 syncResult.NewPlayers.ToArray());
             CollectionAssert.AreEquivalent(
-                playerRows.Where(p => p.ID == "3" || p.ID == "5").ToArray(),
+                playerRows.Where(r => r.ID == "3" || r.ID == "5").ToArray(),
                 syncResult.UpdatedPlayerRows.ToArray());
             CollectionAssert.AreEqual(
                 new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.ID).ToArray());
