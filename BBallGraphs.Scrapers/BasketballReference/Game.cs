@@ -9,6 +9,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
         public string PlayerName { get; set; }
         public int Season { get; set; }
         public DateTime Date { get; set; }
+        public string Team { get; set; }
+        public string OpponentTeam { get; set; }
         public bool IsPlayoffGame { get; set; }
         public string BoxScoreUrl { get; set; }
         public string ID { get; set; }
@@ -45,8 +47,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
             if (firstGameData.PlayerID != secondGameData.PlayerID
                 || firstGameData.Season != secondGameData.Season
                 || firstGameData.Date != secondGameData.Date
-                || firstGameData.BoxScoreUrl != secondGameData.BoxScoreUrl
-                || firstGameData.Matches(secondGameData))
+                || firstGameData.Team == secondGameData.Team
+                || firstGameData.BoxScoreUrl != secondGameData.BoxScoreUrl)
                 throw new InvalidOperationException("Game datas aren't split, which is when a player plays for both teams in the same game.");
 
             return new Game
@@ -55,6 +57,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 PlayerName = firstGameData.PlayerName,
                 Season = firstGameData.Season,
                 Date = firstGameData.Date,
+                Team = secondGameData.Team,
+                OpponentTeam = secondGameData.OpponentTeam,
                 IsPlayoffGame = firstGameData.IsPlayoffGame,
                 BoxScoreUrl = firstGameData.BoxScoreUrl,
                 ID = firstGameData.ID,

@@ -63,6 +63,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 PlayerName = "LeBron James",
                 Season = 2004,
                 Date = new DateTime(2003, 10, 29).AsUtc(),
+                Team = "CLE",
+                OpponentTeam = "SAC",
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200310290SAC.html",
                 ID = "jamesle01 10/29/2003",
@@ -95,6 +97,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 PlayerName = "LeBron James",
                 Season = 2004,
                 Date = new DateTime(2003, 11, 05).AsUtc(),
+                Team = "CLE",
+                OpponentTeam = "DEN",
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200311050CLE.html",
                 ID = "jamesle01 11/5/2003",
@@ -213,6 +217,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 PlayerName = "Carl Braun",
                 Season = 1949,
                 Date = new DateTime(1948, 11, 03).AsUtc(),
+                Team = "NYK",
+                OpponentTeam = "FTW",
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/194811030FTW.html",
                 ID = "braunca01 11/3/1948",
@@ -344,6 +350,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             var mergedGameData = games.Single(g => g.Date == new DateTime(1978, 11, 8).AsUtc());
 
+            Assert.AreEqual("PHI", mergedGameData.Team);
+            Assert.AreEqual("NJN", mergedGameData.OpponentTeam);
             Assert.IsTrue(mergedGameData.Won);
             Assert.IsTrue(mergedGameData.Started.Value);
             Assert.AreEqual(27, mergedGameData.Points);

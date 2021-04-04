@@ -8,6 +8,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
         string PlayerName { get; set; }
         int Season { get; set; }
         DateTime Date { get; set; }
+        string Team { get; set; }
+        string OpponentTeam { get; set; }
         bool IsPlayoffGame { get; set; }
         string BoxScoreUrl { get; set; }
         string ID { get; set; }
@@ -41,6 +43,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
             && game.PlayerName == otherGame.PlayerName
             && game.Season == otherGame.Season
             && game.Date == otherGame.Date
+            && game.Team == otherGame.Team
+            && game.OpponentTeam == otherGame.OpponentTeam
             && game.IsPlayoffGame == otherGame.IsPlayoffGame
             && game.BoxScoreUrl == otherGame.BoxScoreUrl
             && game.ID == otherGame.ID
@@ -72,6 +76,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
             targetGame.PlayerName = sourceGame.PlayerName;
             targetGame.Season = sourceGame.Season;
             targetGame.Date = sourceGame.Date;
+            targetGame.Team = sourceGame.Team;
+            targetGame.OpponentTeam = sourceGame.OpponentTeam;
             targetGame.IsPlayoffGame = sourceGame.IsPlayoffGame;
             targetGame.BoxScoreUrl = sourceGame.BoxScoreUrl;
             targetGame.ID = sourceGame.ID;

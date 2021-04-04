@@ -12,6 +12,8 @@ namespace BBallGraphs.Syncer.Rows
         public string PlayerName { get; set; }
         public int Season { get; set; }
         public DateTime Date { get; set; }
+        public string Team { get; set; }
+        public string OpponentTeam { get; set; }
         public bool IsPlayoffGame { get; set; }
         public string BoxScoreUrl { get; set; }
         public string ID { get; set; }

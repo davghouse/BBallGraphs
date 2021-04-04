@@ -135,6 +135,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         PlayerName = player.Name,
                         Season = season,
                         Date =  DateTime.Parse(gameRowCells.GetStatCell("date_game").TextContent.Trim()).AsUtc(),
+                        Team = gameRowCells.GetStatCell("team_id").TextContent.Trim(),
+                        OpponentTeam = gameRowCells.GetStatCell("opp_id").TextContent.Trim(),
                         IsPlayoffGame = gameRow.Id.Contains("pgl_basic_playoffs"),
                         BoxScoreUrl = (gameRowCells.GetStatCell("date_game").FirstChild as IHtmlAnchorElement).Href.Trim(),
                         Won =  gameRowCells.GetStatCell("game_result").TextContent.Contains("W"),
