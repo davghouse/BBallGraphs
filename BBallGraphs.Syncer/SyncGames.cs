@@ -39,6 +39,12 @@ namespace BBallGraphs.Syncer
                 throw new SyncException("Defunct game rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctGameRows.Select(g => g.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
+            // For now we want to keep an eye on how game rows get updated. We want to verify the updates are legitimate and not the
+            // result of a scraping problem. Once we understand how they get updated, this can be removed or made more lenient.
+            if (syncResult.UpdatedGameRows.Any())
+                throw new SyncException($"Updated game rows found, manual intervention required: " +
+                    $"{string.Join(", ", syncResult.UpdatedGameRows.Select(g => g.ID))}", playerRow.GetGameLogUrl(syncSeason));
+
             log.LogInformation(syncResult.NewGames.Any()
                 ? $"New games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.NewGames.Select(g => g.ID))}"
                 : $"No new games found for {playerRow.Name}'s {syncSeason} season.");
