@@ -15,8 +15,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -28,8 +28,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
             var playerRow = PlayerRow.CreateRow(player, DateTime.UtcNow);
 
             Assert.AreEqual("0", playerRow.PartitionKey);
-            Assert.AreEqual("https://www.basketball-reference.com/players/j/", playerRow.FeedUrl);
             Assert.AreEqual("jamesle01", playerRow.ID);
+            Assert.AreEqual("https://www.basketball-reference.com/players/j/", playerRow.FeedUrl);
             Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01.html", playerRow.GetProfileUrl());
             Assert.AreEqual("LeBron James", playerRow.Name);
             Assert.AreEqual(2004, playerRow.FirstSeason);
@@ -61,8 +61,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
             var utcNow = DateTime.UtcNow;
             var playerRow = new PlayerRow
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "testte01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "test test",
                 FirstSeason = utcNow.Year - 10,
                 LastSeason = utcNow.Year,
@@ -81,8 +81,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
         {
             var playerRow = new PlayerRow
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "testte01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "test test",
                 FirstSeason = 2000,
                 LastSeason = 2010,
@@ -102,8 +102,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
             var utcNow = DateTime.UtcNow;
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "testte01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "test test",
                 FirstSeason = utcNow.Year - 10,
                 LastSeason = utcNow.Year,
@@ -139,8 +139,8 @@ namespace BBallGraphs.Syncer.Tests.Rows
             var utcNow = DateTime.UtcNow;
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "testte01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "test test",
                 FirstSeason = 2000,
                 LastSeason = 2010,

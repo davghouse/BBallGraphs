@@ -477,8 +477,8 @@ namespace BBallGraphs.Syncer.Tests
             var players = Enumerable.Range(1, 3)
                 .Select(i => new Player
                 {
-                    FeedUrl = playerFeed.Url,
                     ID = i.ToString(),
+                    FeedUrl = playerFeed.Url,
                     FirstSeason = DateTime.UtcNow.Year - 5,
                     LastSeason = DateTime.UtcNow.Year,
                     BirthDate = DateTime.UtcNow.AddYears(-25)

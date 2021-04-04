@@ -13,8 +13,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player1 = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -25,8 +25,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             };
             var player2 = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/l/",
                 ID = "lamesje01",
+                FeedUrl = "https://www.basketball-reference.com/players/l/",
                 Name = "JeBron Lames",
                 FirstSeason = 2020,
                 LastSeason = 2036,
@@ -40,8 +40,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.IsFalse(player1.Matches(player2));
             Assert.IsFalse(player2.Matches(player1));
 
-            player2.FeedUrl = "https://www.basketball-reference.com/players/j/";
             player2.ID = "jamesle01";
+            player2.FeedUrl = "https://www.basketball-reference.com/players/j/";
             player2.Name = "LeBron James";
             player2.FirstSeason = 2004;
             player2.Position = "F-G";
@@ -63,8 +63,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player1 = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -75,8 +75,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             };
             var player2 = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/l/",
                 ID = "lamesje01",
+                FeedUrl = "https://www.basketball-reference.com/players/l/",
                 Name = "JeBron Lames",
                 FirstSeason = 2020,
                 LastSeason = 2036,
@@ -100,8 +100,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -120,8 +120,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/t/",
                 ID = "testte01",
+                FeedUrl = "https://www.basketball-reference.com/players/t/",
                 Name = "test test",
                 FirstSeason = 2000,
                 Position = "F-G",

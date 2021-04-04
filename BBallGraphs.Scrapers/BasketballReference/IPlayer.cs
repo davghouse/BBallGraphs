@@ -4,8 +4,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public interface IPlayer
     {
-        string FeedUrl { get; set; }
         string ID { get; set; }
+        string FeedUrl { get; set; }
         string Name { get; set; }
         int FirstSeason { get; set; }
         int LastSeason { get; set; }
@@ -18,8 +18,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
     public static class IPlayerExtensions
     {
         public static bool Matches(this IPlayer player, IPlayer otherPlayer)
-            => player.FeedUrl == otherPlayer.FeedUrl
-            && player.ID == otherPlayer.ID
+            => player.ID == otherPlayer.ID
+            && player.FeedUrl == otherPlayer.FeedUrl
             && player.Name == otherPlayer.Name
             && player.FirstSeason == otherPlayer.FirstSeason
             && player.LastSeason == otherPlayer.LastSeason
@@ -30,8 +30,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public static void CopyTo(this IPlayer sourcePlayer, IPlayer targetPlayer)
         {
-            targetPlayer.FeedUrl = sourcePlayer.FeedUrl;
             targetPlayer.ID = sourcePlayer.ID;
+            targetPlayer.FeedUrl = sourcePlayer.FeedUrl;
             targetPlayer.Name = sourcePlayer.Name;
             targetPlayer.FirstSeason = sourcePlayer.FirstSeason;
             targetPlayer.LastSeason = sourcePlayer.LastSeason;

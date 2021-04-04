@@ -78,8 +78,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
                     var player = new Player
                     {
-                        FeedUrl = playerFeed.Url,
                         ID = _profileUrlIDRegex.Match(profileUrl).Groups[1].Value,
+                        FeedUrl = playerFeed.Url,
                         Name = playerCellAnchor.TextContent.Trim(),
                         FirstSeason = int.Parse(playerRowCells.GetStatCell("year_min").TextContent),
                         LastSeason = int.Parse(playerRowCells.GetStatCell("year_max").TextContent),

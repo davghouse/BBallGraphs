@@ -44,8 +44,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -152,8 +152,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jamesle01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "LeBron James",
                 FirstSeason = 2004,
                 LastSeason = 2020,
@@ -205,8 +205,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/b/",
                 ID = "braunca01",
+                FeedUrl = "https://www.basketball-reference.com/players/b/",
                 Name = "Carl Braun",
                 FirstSeason = 1948,
                 LastSeason = 1962,
@@ -302,8 +302,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 ID = "jordami01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
                 Name = "Michael Jordan",
                 FirstSeason = 1985,
                 LastSeason = 2003,
@@ -322,8 +322,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/o/",
                 ID = "odengr01",
+                FeedUrl = "https://www.basketball-reference.com/players/o/",
                 Name = "Greg Oden",
                 FirstSeason = 2008,
                 LastSeason = 2014,
@@ -342,8 +342,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var player = new Player
             {
-                FeedUrl = "https://www.basketball-reference.com/players/m/",
                 ID = "moneyer01",
+                FeedUrl = "https://www.basketball-reference.com/players/m/",
                 Name = "Eric Money",
                 FirstSeason = 1975,
                 LastSeason = 1980,

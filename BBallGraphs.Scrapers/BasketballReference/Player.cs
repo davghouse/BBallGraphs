@@ -4,8 +4,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public class Player : IPlayer
     {
-        public string FeedUrl { get; set; }
         public string ID { get; set; }
+        public string FeedUrl { get; set; }
         public string Name { get; set; }
         public int FirstSeason { get; set; }
         public int LastSeason { get; set; }
