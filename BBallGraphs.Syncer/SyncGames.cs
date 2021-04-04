@@ -4,13 +4,14 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BBallGraphs.Syncer
 {
     public static class SyncGames
     {
         [FunctionName(nameof(SyncGames))]
-        public static async void Run(
+        public static async Task Run(
             // Every 3 minutes, between 8:00 PM and 6:59 AM every day. Trying to go very easy on them.
             [TimerTrigger("0 */3 0-6,20-23 * * *")]TimerInfo timer,
             ILogger log)
