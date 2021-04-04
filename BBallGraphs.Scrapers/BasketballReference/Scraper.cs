@@ -158,7 +158,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         Blocks = NullableHelper.TryParseInt(gameRowCells.GetStatCell("blk")?.TextContent),
                         Turnovers = NullableHelper.TryParseInt(gameRowCells.GetStatCell("tov")?.TextContent),
                         PersonalFouls = NullableHelper.TryParseInt(gameRowCells.GetStatCell("pf")?.TextContent),
-                        Points = int.Parse(gameRowCells.GetStatCell("pts")?.TextContent),
+                        Points = int.Parse(gameRowCells.GetStatCell("pts").TextContent),
                         GameScore = NullableHelper.TryParseDouble(gameRowCells.GetStatCell("game_score")?.TextContent),
                         PlusMinus = NullableHelper.TryParseInt(gameRowCells.GetStatCell("plus_minus")?.TextContent)
                     };
