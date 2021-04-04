@@ -137,6 +137,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         Date =  DateTime.Parse(gameRowCells.GetStatCell("date_game").TextContent.Trim()).AsUtc(),
                         Team = gameRowCells.GetStatCell("team_id").TextContent.Trim(),
                         OpponentTeam = gameRowCells.GetStatCell("opp_id").TextContent.Trim(),
+                        IsHomeGame = !(gameRowCells.GetStatCell("game_location")?.TextContent ?? "").Contains("@"),
                         IsPlayoffGame = gameRow.Id.Contains("pgl_basic_playoffs"),
                         BoxScoreUrl = (gameRowCells.GetStatCell("date_game").FirstChild as IHtmlAnchorElement).Href.Trim(),
                         Won =  gameRowCells.GetStatCell("game_result").TextContent.Contains("W"),
@@ -178,6 +179,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 }
 
                 if (games.Count > 110 /* 82 + 7*4, more are technically possible if traded but let's ignore that. */
+                    || games.Count(g => g.IsHomeGame) > 70
                     || games.Count(g => g.IsPlayoffGame) > 28
                     || games.Count != games.Select(g => g.Date).Distinct().Count()
                     || games.Any(g => g.Date < new DateTime(1946, 1, 1)

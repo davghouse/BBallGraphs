@@ -11,6 +11,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
         public DateTime Date { get; set; }
         public string Team { get; set; }
         public string OpponentTeam { get; set; }
+        public bool IsHomeGame { get; set; }
         public bool IsPlayoffGame { get; set; }
         public string BoxScoreUrl { get; set; }
         public string ID { get; set; }
@@ -59,6 +60,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 Date = firstGameData.Date,
                 Team = secondGameData.Team,
                 OpponentTeam = secondGameData.OpponentTeam,
+                IsHomeGame = secondGameData.IsHomeGame,
                 IsPlayoffGame = firstGameData.IsPlayoffGame,
                 BoxScoreUrl = firstGameData.BoxScoreUrl,
                 ID = firstGameData.ID,

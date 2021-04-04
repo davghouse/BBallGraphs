@@ -34,6 +34,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(1990, 1, 1).AsUtc(),
                 Team = "CLE",
                 OpponentTeam = "GSW",
+                IsHomeGame = false,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/19900101CLE.html",
                 ID = "testte01 1/1/1990",
@@ -68,6 +69,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 Date = new DateTime(1990, 1, 1).AsUtc(),
                 Team = "GSW",
                 OpponentTeam = "CLE",
+                IsHomeGame = true,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/19900101CLE.html",
                 ID = "testte01 1/1/1990",
@@ -102,6 +104,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.AreEqual(new DateTime(1990, 1, 1).AsUtc(), mergedGameData.Date);
             Assert.AreEqual("GSW", mergedGameData.Team);
             Assert.AreEqual("CLE", mergedGameData.OpponentTeam);
+            Assert.IsTrue(mergedGameData.IsHomeGame);
             Assert.IsFalse(mergedGameData.IsPlayoffGame);
             Assert.AreEqual("https://www.basketball-reference.com/boxscores/19900101CLE.html", mergedGameData.BoxScoreUrl);
             Assert.AreEqual("testte01 1/1/1990", mergedGameData.ID);
