@@ -139,7 +139,9 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         OpponentTeam = gameRowCells.GetStatCell("opp_id").TextContent.Trim(),
                         IsHomeGame = !(gameRowCells.GetStatCell("game_location")?.TextContent ?? "").Contains("@"),
                         IsPlayoffGame = gameRow.Id.Contains("pgl_basic_playoffs"),
-                        BoxScoreUrl = (gameRowCells.GetStatCell("date_game").FirstChild as IHtmlAnchorElement).Href.Trim(),
+                        BoxScoreUrl = (gameRowCells.GetStatCell("date_game").FirstChild as IHtmlAnchorElement).Href.Trim()
+                            // Necessary for the commented playoffs game log data mentioned above.
+                            .Replace("about://", "https://www.basketball-reference.com"),
                         Won =  gameRowCells.GetStatCell("game_result").TextContent.Contains("W"),
                         Started = string.IsNullOrWhiteSpace(gameRowCells.GetStatCell("gs")?.TextContent) ? null
                             : (bool?)gameRowCells.GetStatCell("gs").TextContent.Contains("1"),

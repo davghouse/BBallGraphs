@@ -160,8 +160,78 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 BirthDate = new DateTime(1984, 12, 30).AsUtc()
             };
             var games = await Scraper.GetGames(player, 2016);
-            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
-            var playoffGames = games.Where(g => g.IsPlayoffGame);
+            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame).ToArray();
+            var playoffGames = games.Where(g => g.IsPlayoffGame).ToArray();
+
+            Assert.IsTrue(playoffGames[18].Matches(new Game
+            {
+                ID = "jamesle01 6/13/2016",
+                PlayerID = "jamesle01",
+                PlayerName = "LeBron James",
+                Season = 2016,
+                Date = new DateTime(2016, 6, 13).AsUtc(),
+                Team = "CLE",
+                OpponentTeam = "GSW",
+                IsHomeGame = false,
+                IsPlayoffGame = true,
+                BoxScoreUrl = "https://www.basketball-reference.com/boxscores/201606130GSW.html",
+                AgeInDays = 11488,
+                Won = true,
+                Started = true,
+                SecondsPlayed = 2558,
+                FieldGoalsMade = 16,
+                FieldGoalsAttempted = 30,
+                ThreePointersMade = 4,
+                ThreePointersAttempted = 8,
+                FreeThrowsMade = 5,
+                FreeThrowsAttempted = 8,
+                OffensiveRebounds = 4,
+                DefensiveRebounds = 12,
+                TotalRebounds = 16,
+                Assists = 7,
+                Steals = 3,
+                Blocks = 3,
+                Turnovers = 2,
+                PersonalFouls = 1,
+                Points = 41,
+                GameScore = 39.2,
+                PlusMinus = 13
+            }));
+
+            Assert.IsTrue(playoffGames[19].Matches(new Game
+            {
+                ID = "jamesle01 6/16/2016",
+                PlayerID = "jamesle01",
+                PlayerName = "LeBron James",
+                Season = 2016,
+                Date = new DateTime(2016, 6, 16).AsUtc(),
+                Team = "CLE",
+                OpponentTeam = "GSW",
+                IsHomeGame = true,
+                IsPlayoffGame = true,
+                BoxScoreUrl = "https://www.basketball-reference.com/boxscores/201606160CLE.html",
+                AgeInDays = 11491,
+                Won = true,
+                Started = true,
+                SecondsPlayed = 2555,
+                FieldGoalsMade = 16,
+                FieldGoalsAttempted = 27,
+                ThreePointersMade = 3,
+                ThreePointersAttempted = 6,
+                FreeThrowsMade = 6,
+                FreeThrowsAttempted = 8,
+                OffensiveRebounds = 2,
+                DefensiveRebounds = 6,
+                TotalRebounds = 8,
+                Assists = 11,
+                Steals = 4,
+                Blocks = 3,
+                Turnovers = 1,
+                PersonalFouls = 3,
+                Points = 41,
+                GameScore = 42.5,
+                PlusMinus = 26
+            }));
 
             Assert.AreEqual(76, regularSeasonGames.Count());
             Assert.AreEqual(38, regularSeasonGames.Where(g => g.IsHomeGame).Count());
