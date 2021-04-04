@@ -28,10 +28,10 @@ namespace BBallGraphs.Syncer
             int syncSeason = playerRow.GetNextSyncSeason();
 
             var gameRows = await syncService.GetGameRows(playerRow, syncSeason);
-            log.LogInformation($"Queried games table for the {syncSeason} season: {gameRows.Count} rows returned.");
+            log.LogInformation($"Queried games table for {playerRow.Name}'s {syncSeason} season: {gameRows.Count} rows returned.");
 
             var games = await Scraper.GetGames(playerRow, syncSeason);
-            log.LogInformation($"Scraped games for the {syncSeason} season: {games.Count} found.");
+            log.LogInformation($"Scraped games for {playerRow.Name}'s {syncSeason} season: {games.Count} found.");
 
             var syncResult = new SyncGamesResult(gameRows, games);
 
@@ -40,11 +40,11 @@ namespace BBallGraphs.Syncer
                     $"{string.Join(", ", syncResult.DefunctGameRows.Select(g => g.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
             log.LogInformation(syncResult.NewGames.Any()
-                ? $"New games found for the {syncSeason} season: {string.Join(", ", syncResult.NewGames.Select(g => g.ID))}"
-                : $"No new games found for the {syncSeason} season.");
+                ? $"New games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.NewGames.Select(g => g.ID))}"
+                : $"No new games found for {playerRow.Name}'s {syncSeason} season.");
             log.LogInformation(syncResult.UpdatedGameRows.Any()
-                ? $"Updated games found for the {syncSeason} season: {string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}"
-                : $"No updated games found for the {syncSeason} season.");
+                ? $"Updated games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}"
+                : $"No updated games found for {playerRow.Name}'s {syncSeason} season.");
 
             if (syncResult.FoundChanges)
             {
