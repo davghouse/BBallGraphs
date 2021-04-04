@@ -60,6 +60,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             Assert.IsTrue(games[0].Matches(new Game
             {
+                ID = "jamesle01 10/29/2003",
                 PlayerID = "jamesle01",
                 PlayerName = "LeBron James",
                 Season = 2004,
@@ -69,7 +70,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = false,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200310290SAC.html",
-                ID = "jamesle01 10/29/2003",
                 AgeInDays = 6877,
                 Won = false,
                 Started = true,
@@ -95,6 +95,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             Assert.IsTrue(games[3].Matches(new Game
             {
+                ID = "jamesle01 11/5/2003",
                 PlayerID = "jamesle01",
                 PlayerName = "LeBron James",
                 Season = 2004,
@@ -104,7 +105,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = true,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200311050CLE.html",
-                ID = "jamesle01 11/5/2003",
                 AgeInDays = 6884,
                 Won = false,
                 Started = true,
@@ -218,6 +218,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             Assert.IsTrue(games[0].Matches(new Game
             {
+                ID = "braunca01 11/3/1948",
                 PlayerID = "braunca01",
                 PlayerName = "Carl Braun",
                 Season = 1949,
@@ -227,7 +228,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = false,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/194811030FTW.html",
-                ID = "braunca01 11/3/1948",
                 AgeInDays = 7710,
                 Won = true,
                 Started = null,

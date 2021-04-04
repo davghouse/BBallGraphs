@@ -123,10 +123,10 @@ namespace BBallGraphs.Syncer.Tests
                 .SelectMany(i => Enumerable.Range(1, 110)
                     .Select(j => new Game
                     {
+                        ID = $"{players[i - 1].ID}-{j}",
                         PlayerID = players[i - 1].ID,
                         Season = 2000 + i - 1,
-                        Date = new DateTime(2000 + i - 1, 1, 1).AddDays(j).AsUtc(),
-                        ID = $"{players[i - 1].ID}-{j}"
+                        Date = new DateTime(2000 + i - 1, 1, 1).AddDays(j).AsUtc()
                     }))
                 .ToArray();
             var syncResult = new SyncGamesResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "1"));
@@ -319,10 +319,10 @@ namespace BBallGraphs.Syncer.Tests
                 .SelectMany(i => Enumerable.Range(1, 110)
                     .Select(j => new Game
                     {
+                        ID = $"{players[i - 1].ID}-{j}",
                         PlayerID = players[i - 1].ID,
                         Season = 2000 + i - 1,
                         Date = new DateTime(2000 + i - 1, 1, 1).AddDays(j).AsUtc(),
-                        ID = $"{players[i - 1].ID}-{j}",
                         Points = 10,
                         TotalRebounds = 5
                     })).ToArray();
@@ -336,19 +336,19 @@ namespace BBallGraphs.Syncer.Tests
 
             var updatedGamesPlayer1 = gameRowsPlayer1Season2000.Select(r => new Game
             {
+                ID = r.ID,
                 PlayerID = r.PlayerID,
                 Season = r.Season,
                 Date = r.Date,
-                ID = r.ID,
                 Points = r.Points + 15,
                 TotalRebounds = r.TotalRebounds + 10
             }).Concat(Enumerable.Range(1, 80)
                 .Select(i => new Game
                 {
+                    ID = $"{players[0].ID}-{110 + i}",
                     PlayerID = players[0].ID,
                     Season = 2001,
                     Date = new DateTime(2001, 1, 1).AddDays(i).AsUtc(),
-                    ID = $"{players[0].ID}-{110 + i}",
                     Points = 15,
                     TotalRebounds = 10
                 })).ToArray();
@@ -382,19 +382,19 @@ namespace BBallGraphs.Syncer.Tests
 
             var updatedGamesPlayer5 = gameRowsPlayer5Season2004.Select((r, i) => new Game
             {
+                ID = r.ID,
                 PlayerID = r.PlayerID,
                 Season = r.Season,
                 Date = r.Date,
-                ID = r.ID,
                 Points = r.Points + (i % 2 == 0 ? 15 : 0),
                 TotalRebounds = r.TotalRebounds + (i % 2 == 0 ? 10 : 0)
             }).Concat(Enumerable.Range(1, 80)
                 .Select(i => new Game
                 {
+                    ID = $"{players[4].ID}-{110 + i}",
                     PlayerID = players[4].ID,
                     Season = 2005,
                     Date = new DateTime(2005, 1, 1).AddDays(i).AsUtc(),
-                    ID = $"{players[4].ID}-{110 + i}",
                     Points = 15,
                     TotalRebounds = 10
                 })).ToArray();

@@ -5,6 +5,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public class Game : IGame
     {
+        public string ID { get; set; }
         public string PlayerID { get; set; }
         public string PlayerName { get; set; }
         public int Season { get; set; }
@@ -14,7 +15,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
         public bool IsHomeGame { get; set; }
         public bool IsPlayoffGame { get; set; }
         public string BoxScoreUrl { get; set; }
-        public string ID { get; set; }
         public int AgeInDays { get; set; }
         public bool Won { get; set; }
         public bool? Started { get; set; }
@@ -54,6 +54,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
             return new Game
             {
+                ID = firstGameData.ID,
                 PlayerID = firstGameData.PlayerID,
                 PlayerName = firstGameData.PlayerName,
                 Season = firstGameData.Season,
@@ -63,7 +64,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
                 IsHomeGame = secondGameData.IsHomeGame,
                 IsPlayoffGame = firstGameData.IsPlayoffGame,
                 BoxScoreUrl = firstGameData.BoxScoreUrl,
-                ID = firstGameData.ID,
                 AgeInDays = firstGameData.AgeInDays,
                 Won = secondGameData.Won,
                 Started = firstGameData.Started,

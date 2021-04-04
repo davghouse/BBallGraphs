@@ -8,6 +8,7 @@ namespace BBallGraphs.Syncer.Rows
 {
     public class GameRow : TableEntity, IGame
     {
+        public string ID { get; set; }
         public string PlayerID { get; set; }
         public string PlayerName { get; set; }
         public int Season { get; set; }
@@ -17,7 +18,6 @@ namespace BBallGraphs.Syncer.Rows
         public bool IsHomeGame { get; set; }
         public bool IsPlayoffGame { get; set; }
         public string BoxScoreUrl { get; set; }
-        public string ID { get; set; }
         public int AgeInDays { get; set; }
         public bool Won { get; set; }
         public bool? Started { get; set; }

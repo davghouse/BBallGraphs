@@ -4,6 +4,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public interface IGame
     {
+        string ID { get; set; }
         string PlayerID { get; set; }
         string PlayerName { get; set; }
         int Season { get; set; }
@@ -13,7 +14,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
         bool IsHomeGame { get; set; }
         bool IsPlayoffGame { get; set; }
         string BoxScoreUrl { get; set; }
-        string ID { get; set; }
         int AgeInDays { get; set; }
         bool Won { get; set; }
         bool? Started { get; set; }
@@ -40,7 +40,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
     public static class IGameExtensions
     {
         public static bool Matches(this IGame game, IGame otherGame)
-            => game.PlayerID == otherGame.PlayerID
+            => game.ID == otherGame.ID
+            && game.PlayerID == otherGame.PlayerID
             && game.PlayerName == otherGame.PlayerName
             && game.Season == otherGame.Season
             && game.Date == otherGame.Date
@@ -49,7 +50,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
             && game.IsHomeGame == otherGame.IsHomeGame
             && game.IsPlayoffGame == otherGame.IsPlayoffGame
             && game.BoxScoreUrl == otherGame.BoxScoreUrl
-            && game.ID == otherGame.ID
             && game.AgeInDays == otherGame.AgeInDays
             && game.Won == otherGame.Won
             && game.Started == otherGame.Started
@@ -74,6 +74,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public static void CopyTo(this IGame sourceGame, IGame targetGame)
         {
+            targetGame.ID = sourceGame.ID;
             targetGame.PlayerID = sourceGame.PlayerID;
             targetGame.PlayerName = sourceGame.PlayerName;
             targetGame.Season = sourceGame.Season;
@@ -83,7 +84,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
             targetGame.IsHomeGame = sourceGame.IsHomeGame;
             targetGame.IsPlayoffGame = sourceGame.IsPlayoffGame;
             targetGame.BoxScoreUrl = sourceGame.BoxScoreUrl;
-            targetGame.ID = sourceGame.ID;
             targetGame.AgeInDays = sourceGame.AgeInDays;
             targetGame.Won = sourceGame.Won;
             targetGame.Started = sourceGame.Started;

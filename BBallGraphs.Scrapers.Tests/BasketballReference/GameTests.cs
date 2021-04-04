@@ -28,6 +28,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var firstGameData = new Game
             {
+                ID = "testte01 1/1/1990",
                 PlayerID = "testte01",
                 PlayerName = "test test",
                 Season = 1990,
@@ -37,7 +38,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = false,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/19900101CLE.html",
-                ID = "testte01 1/1/1990",
                 AgeInDays = 10000,
                 Won = false,
                 Started = true,
@@ -63,6 +63,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             var secondGameData = new Game
             {
+                ID = "testte01 1/1/1990",
                 PlayerID = "testte01",
                 PlayerName = "test test",
                 Season = 1990,
@@ -72,7 +73,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = true,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/19900101CLE.html",
-                ID = "testte01 1/1/1990",
                 AgeInDays = 10000,
                 Won = true,
                 Started = false,
@@ -98,6 +98,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             var mergedGameData = Game.MergeSplitGameData(firstGameData, secondGameData);
 
+            Assert.AreEqual("testte01 1/1/1990", mergedGameData.ID);
             Assert.AreEqual("testte01", mergedGameData.PlayerID);
             Assert.AreEqual("test test", mergedGameData.PlayerName);
             Assert.AreEqual(1990, mergedGameData.Season);
@@ -107,7 +108,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.IsTrue(mergedGameData.IsHomeGame);
             Assert.IsFalse(mergedGameData.IsPlayoffGame);
             Assert.AreEqual("https://www.basketball-reference.com/boxscores/19900101CLE.html", mergedGameData.BoxScoreUrl);
-            Assert.AreEqual("testte01 1/1/1990", mergedGameData.ID);
             Assert.AreEqual(10000, mergedGameData.AgeInDays);
             Assert.IsTrue(mergedGameData.Won);
             Assert.IsTrue(mergedGameData.Started.Value);

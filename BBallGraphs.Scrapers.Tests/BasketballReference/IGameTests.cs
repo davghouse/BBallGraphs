@@ -13,6 +13,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         {
             var game1 = new Game
             {
+                ID = "jamesle01 10/29/2003",
                 PlayerID = "jamesle01",
                 PlayerName = "LeBron James",
                 Season = 2004,
@@ -22,7 +23,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = false,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200310290SAC.html",
-                ID = "jamesle01 10/29/2003",
                 AgeInDays = 6877,
                 Won = false,
                 Started = true,
@@ -48,6 +48,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
 
             var game2 = new Game
             {
+                ID = "jamesle01 11/5/2003",
                 PlayerID = "jamesle01",
                 PlayerName = "LeBron James",
                 Season = 2004,
@@ -57,7 +58,6 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 IsHomeGame = true,
                 IsPlayoffGame = false,
                 BoxScoreUrl = "https://www.basketball-reference.com/boxscores/200311050CLE.html",
-                ID = "jamesle01 11/5/2003",
                 AgeInDays = 6884,
                 Won = false,
                 Started = true,
@@ -85,8 +85,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.IsFalse(game1.Matches(game2));
             Assert.IsFalse(game2.Matches(game1));
 
-            game2.Date = new DateTime(2003, 10, 29).AsUtc();
             game2.ID = "jamesle01 10/29/2003";
+            game2.Date = new DateTime(2003, 10, 29).AsUtc();
 
             Assert.IsFalse(game1.Matches(game2));
 
