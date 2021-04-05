@@ -17,6 +17,7 @@ namespace BBallGraphs.Syncer
             ILogger log)
         {
             var syncService = new AzureSyncService();
+            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
 
             var playerFeedRow = (await syncService.GetNextPlayerFeedRows(
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
@@ -28,7 +29,7 @@ namespace BBallGraphs.Syncer
             var playerRows = await syncService.GetPlayerRows(playerFeedRow);
             log.LogInformation($"Queried players table: {playerRows.Count} rows returned.");
 
-            var players = await Scraper.GetPlayers(playerFeedRow);
+            var players = await scraper.GetPlayers(playerFeedRow);
             log.LogInformation($"Scraped players: {players.Count} found.");
 
             var syncResult = new SyncPlayersResult(playerRows, players);

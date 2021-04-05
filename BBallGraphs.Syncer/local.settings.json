@@ -2,6 +2,7 @@
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "TransparentUserAgent":  "BBallGraphs Scraper Tests (https://github.com/davghouse/BBallGraphs)",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet"
     }
 }

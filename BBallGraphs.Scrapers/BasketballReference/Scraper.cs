@@ -12,21 +12,29 @@ using System.Threading.Tasks;
 
 namespace BBallGraphs.Scrapers.BasketballReference
 {
-    public static class Scraper
+    public class Scraper
     {
-        private static readonly Regex _profileUrlIDRegex
+        protected static readonly Regex _profileUrlIDRegex
             = new Regex("^https://www.basketball-reference.com/players/./(.+)\\.html$", RegexOptions.Compiled);
 
-        private static IBrowsingContext GetBrowsingContext()
+        public Scraper(string userAgent)
+            => UserAgent = userAgent;
+
+        public string UserAgent { get; set; }
+
+        protected virtual IBrowsingContext GetBrowsingContext()
         {
             var requester = new DefaultHttpRequester();
-            requester.Headers["User-Agent"] = ScrapeHelper.TransparentUserAgent;
+            requester.Headers["User-Agent"] = UserAgent;
             var config = Configuration.Default.With(requester).WithDefaultLoader();
 
             return BrowsingContext.New(config);
         }
 
-        public static async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
+        protected static IElement GetStatCell(IEnumerable<IElement> rowCells, string statAttributeValue)
+            => rowCells.SingleOrDefault(c => c.GetAttribute("data-stat") == statAttributeValue);
+
+        public virtual async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
         {
             var browsingContext = GetBrowsingContext();
             string playerFeedsUrl = "https://www.basketball-reference.com/players";
@@ -50,10 +58,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
             }
         }
 
-        private static IElement GetStatCell(this IEnumerable<IElement> rowCells, string statAttributeValue)
-            => rowCells.SingleOrDefault(c => c.GetAttribute("data-stat") == statAttributeValue);
-
-        public static async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
+        public virtual async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
         {
             var browsingContext = GetBrowsingContext();
 
@@ -65,7 +70,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                     .QuerySelectorAll("table#players tbody tr:not(.thead)"))
                 {
                     var playerRowCells = playerRow.Children;
-                    var playerCell = playerRowCells.GetStatCell("player");
+                    var playerCell = GetStatCell(playerRowCells, "player");
                     // <strong> tag wraps anchors for active players.
                     var playerCellAnchor = (playerCell.FirstChild as IHtmlAnchorElement)
                         ?? (IHtmlAnchorElement)playerCell.FirstChild.FirstChild;
@@ -78,13 +83,13 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         ID = _profileUrlIDRegex.Match(profileUrl).Groups[1].Value,
                         FeedUrl = playerFeed.Url,
                         Name = playerCellAnchor.TextContent.Trim(),
-                        FirstSeason = int.Parse(playerRowCells.GetStatCell("year_min").TextContent),
-                        LastSeason = int.Parse(playerRowCells.GetStatCell("year_max").TextContent),
-                        Position = playerRowCells.GetStatCell("pos").TextContent.Trim(),
-                        HeightInInches = ScrapeHelper.ParseHeightInInches(playerRowCells.GetStatCell("height").TextContent),
-                        WeightInPounds = NullableHelper.TryParseDouble(playerRowCells.GetStatCell("weight").TextContent),
+                        FirstSeason = int.Parse(GetStatCell(playerRowCells, "year_min").TextContent),
+                        LastSeason = int.Parse(GetStatCell(playerRowCells, "year_max").TextContent),
+                        Position = GetStatCell(playerRowCells, "pos").TextContent.Trim(),
+                        HeightInInches = ScrapeHelper.ParseHeightInInches(GetStatCell(playerRowCells, "height").TextContent),
+                        WeightInPounds = NullableHelper.TryParseDouble(GetStatCell(playerRowCells, "weight").TextContent),
                     };
-                    player.BirthDate = DateTime.TryParse(playerRowCells.GetStatCell("birth_date").TextContent, out DateTime birthDate)
+                    player.BirthDate = DateTime.TryParse(GetStatCell(playerRowCells, "birth_date").TextContent, out DateTime birthDate)
                         ? birthDate.AsUtc() : ScrapeHelper.GetEstimatedBirthDate(player.Name);
 
                     players.Add(player);
@@ -101,7 +106,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
             }
         }
 
-        public static async Task<IReadOnlyList<Game>> GetGames(IPlayer player, int season)
+        public virtual async Task<IReadOnlyList<Game>> GetGames(IPlayer player, int season)
         {
             var browsingContext = GetBrowsingContext();
             string gameLogUrl = player.GetGameLogUrl(season);
@@ -131,35 +136,35 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         PlayerID = player.ID,
                         PlayerName = player.Name,
                         Season = season,
-                        Date =  DateTime.Parse(gameRowCells.GetStatCell("date_game").TextContent.Trim()).AsUtc(),
-                        Team = gameRowCells.GetStatCell("team_id").TextContent.Trim(),
-                        OpponentTeam = gameRowCells.GetStatCell("opp_id").TextContent.Trim(),
-                        IsHomeGame = !(gameRowCells.GetStatCell("game_location")?.TextContent ?? "").Contains("@"),
+                        Date =  DateTime.Parse(GetStatCell(gameRowCells, "date_game").TextContent.Trim()).AsUtc(),
+                        Team = GetStatCell(gameRowCells, "team_id").TextContent.Trim(),
+                        OpponentTeam = GetStatCell(gameRowCells, "opp_id").TextContent.Trim(),
+                        IsHomeGame = !(GetStatCell(gameRowCells, "game_location")?.TextContent ?? "").Contains("@"),
                         IsPlayoffGame = gameRow.Id.Contains("pgl_basic_playoffs"),
-                        BoxScoreUrl = (gameRowCells.GetStatCell("date_game").FirstChild as IHtmlAnchorElement).Href.Trim()
+                        BoxScoreUrl = (GetStatCell(gameRowCells, "date_game").FirstChild as IHtmlAnchorElement).Href.Trim()
                             // Necessary for the commented playoffs game log data mentioned above.
                             .Replace("about://", "https://www.basketball-reference.com"),
-                        Won =  gameRowCells.GetStatCell("game_result").TextContent.Contains("W"),
-                        Started = string.IsNullOrWhiteSpace(gameRowCells.GetStatCell("gs")?.TextContent) ? null
-                            : (bool?)gameRowCells.GetStatCell("gs").TextContent.Contains("1"),
-                        SecondsPlayed = ScrapeHelper.ParseSecondsPlayed(gameRowCells.GetStatCell("mp")?.TextContent),
-                        FieldGoalsMade = NullableHelper.TryParseInt(gameRowCells.GetStatCell("fg")?.TextContent),
-                        FieldGoalsAttempted = NullableHelper.TryParseInt(gameRowCells.GetStatCell("fga")?.TextContent),
-                        ThreePointersMade = NullableHelper.TryParseInt(gameRowCells.GetStatCell("fg3")?.TextContent),
-                        ThreePointersAttempted = NullableHelper.TryParseInt(gameRowCells.GetStatCell("fg3a")?.TextContent),
-                        FreeThrowsMade = NullableHelper.TryParseInt(gameRowCells.GetStatCell("ft")?.TextContent),
-                        FreeThrowsAttempted = NullableHelper.TryParseInt(gameRowCells.GetStatCell("fta")?.TextContent),
-                        OffensiveRebounds = NullableHelper.TryParseInt(gameRowCells.GetStatCell("orb")?.TextContent),
-                        DefensiveRebounds = NullableHelper.TryParseInt(gameRowCells.GetStatCell("drb")?.TextContent),
-                        TotalRebounds = NullableHelper.TryParseInt(gameRowCells.GetStatCell("trb")?.TextContent),
-                        Assists = NullableHelper.TryParseInt(gameRowCells.GetStatCell("ast")?.TextContent),
-                        Steals = NullableHelper.TryParseInt(gameRowCells.GetStatCell("stl")?.TextContent),
-                        Blocks = NullableHelper.TryParseInt(gameRowCells.GetStatCell("blk")?.TextContent),
-                        Turnovers = NullableHelper.TryParseInt(gameRowCells.GetStatCell("tov")?.TextContent),
-                        PersonalFouls = NullableHelper.TryParseInt(gameRowCells.GetStatCell("pf")?.TextContent),
-                        Points = int.Parse(gameRowCells.GetStatCell("pts").TextContent),
-                        GameScore = NullableHelper.TryParseDouble(gameRowCells.GetStatCell("game_score")?.TextContent),
-                        PlusMinus = NullableHelper.TryParseInt(gameRowCells.GetStatCell("plus_minus")?.TextContent)
+                        Won =  GetStatCell(gameRowCells, "game_result").TextContent.Contains("W"),
+                        Started = string.IsNullOrWhiteSpace(GetStatCell(gameRowCells, "gs")?.TextContent) ? null
+                            : (bool?)GetStatCell(gameRowCells, "gs").TextContent.Contains("1"),
+                        SecondsPlayed = ScrapeHelper.ParseSecondsPlayed(GetStatCell(gameRowCells, "mp")?.TextContent),
+                        FieldGoalsMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg")?.TextContent),
+                        FieldGoalsAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fga")?.TextContent),
+                        ThreePointersMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg3")?.TextContent),
+                        ThreePointersAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg3a")?.TextContent),
+                        FreeThrowsMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "ft")?.TextContent),
+                        FreeThrowsAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fta")?.TextContent),
+                        OffensiveRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "orb")?.TextContent),
+                        DefensiveRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "drb")?.TextContent),
+                        TotalRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "trb")?.TextContent),
+                        Assists = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "ast")?.TextContent),
+                        Steals = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "stl")?.TextContent),
+                        Blocks = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "blk")?.TextContent),
+                        Turnovers = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "tov")?.TextContent),
+                        PersonalFouls = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "pf")?.TextContent),
+                        Points = int.Parse(GetStatCell(gameRowCells, "pts").TextContent),
+                        GameScore = NullableHelper.TryParseDouble(GetStatCell(gameRowCells, "game_score")?.TextContent),
+                        PlusMinus = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "plus_minus")?.TextContent)
                     };
                     game.ID = $"{player.ID} {game.Date:d}";
                     game.AgeInDays = (int)(game.Date - player.BirthDate).TotalDays;

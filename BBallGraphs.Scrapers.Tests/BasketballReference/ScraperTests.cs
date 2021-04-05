@@ -10,10 +10,14 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
     [TestClass]
     public class ScraperTests
     {
+        private static readonly string _transparentUserAgent
+            = "BBallGraphs Scraper Tests (https://github.com/davghouse/BBallGraphs)";
+
         [TestMethod]
         public async Task GetPlayerFeeds()
         {
-            var playerFeeds = await Scraper.GetPlayerFeeds();
+            var scraper = new Scraper(_transparentUserAgent);
+            var playerFeeds = await scraper.GetPlayerFeeds();
 
             Assert.IsTrue(playerFeeds.Count >= 25 && playerFeeds.Count <= 26
                 && playerFeeds.First().Url.EndsWith("/a/")
@@ -23,7 +27,8 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetPlayers()
         {
-            var players = await Scraper.GetPlayers(
+            var scraper = new Scraper(_transparentUserAgent);
+            var players = await scraper.GetPlayers(
                 new PlayerFeed { Url = "https://www.basketball-reference.com/players/a/" });
 
             Assert.IsTrue(players.Count >= 166);
@@ -42,6 +47,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForModernPlayer_WhoMissedThePlayoffs()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "jamesle01",
@@ -51,7 +57,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 2020,
                 BirthDate = new DateTime(1984, 12, 30).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 2004);
+            var games = await scraper.GetGames(player, 2004);
 
             Assert.AreEqual(79, games.Count);
             Assert.AreEqual(38, games.Where(g => g.IsHomeGame).Count());
@@ -150,6 +156,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForModernPlayer_WhoMadeThePlayoffs()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "jamesle01",
@@ -159,7 +166,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 2020,
                 BirthDate = new DateTime(1984, 12, 30).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 2016);
+            var games = await scraper.GetGames(player, 2016);
             var regularSeasonGames = games.Where(g => !g.IsPlayoffGame).ToArray();
             var playoffGames = games.Where(g => g.IsPlayoffGame).ToArray();
 
@@ -273,6 +280,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForOldPlayerWithIncompleteStats()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "braunca01",
@@ -282,7 +290,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 1962,
                 BirthDate = new DateTime(1927, 9, 25).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 1949);
+            var games = await scraper.GetGames(player, 1949);
             var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
             var playoffGames = games.Where(g => g.IsPlayoffGame);
 
@@ -370,6 +378,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForPlayerWhoMissedEntireSeason_DueToRetirement()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "jordami01",
@@ -379,7 +388,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 2003,
                 BirthDate = new DateTime(1963, 2, 17).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 1994);
+            var games = await scraper.GetGames(player, 1994);
             var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
             var playoffGames = games.Where(g => g.IsPlayoffGame);
 
@@ -390,6 +399,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForPlayerWhoMissedEntireSeason_DueToInjury()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "odengr01",
@@ -399,7 +409,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 2014,
                 BirthDate = new DateTime(1963, 2, 17).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 2008);
+            var games = await scraper.GetGames(player, 2008);
             var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
             var playoffGames = games.Where(g => g.IsPlayoffGame);
 
@@ -410,6 +420,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
         [TestMethod]
         public async Task GetGamesForAPlayerWhoPlayedForBothTeamsInTheSameGame()
         {
+            var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
             {
                 ID = "moneyer01",
@@ -419,7 +430,7 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
                 LastSeason = 1980,
                 BirthDate = new DateTime(1955, 2, 6).AsUtc()
             };
-            var games = await Scraper.GetGames(player, 1979);
+            var games = await scraper.GetGames(player, 1979);
             var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
             var playoffGames = games.Where(g => g.IsPlayoffGame);
 

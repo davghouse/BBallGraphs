@@ -4,9 +4,6 @@ namespace BBallGraphs.Scrapers.Helpers
 {
     public static class ScrapeHelper
     {
-        public static readonly string TransparentUserAgent
-            = "BBallGraphs Scraper (https://github.com/davghouse/BBallGraphs)";
-
         public static double ParseHeightInInches(string height)
         {
             if (!height.Contains("-"))
