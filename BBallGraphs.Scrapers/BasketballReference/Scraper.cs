@@ -14,11 +14,8 @@ namespace BBallGraphs.Scrapers.BasketballReference
 {
     public static class Scraper
     {
-        private static readonly string _baseUrl
-            = "https://www.basketball-reference.com";
-
         private static readonly Regex _profileUrlIDRegex
-            = new Regex($"^{_baseUrl}/players/./(.+)\\.html$", RegexOptions.Compiled);
+            = new Regex("^https://www.basketball-reference.com/players/./(.+)\\.html$", RegexOptions.Compiled);
 
         private static IBrowsingContext GetBrowsingContext()
         {
@@ -32,7 +29,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
         public static async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
         {
             var browsingContext = GetBrowsingContext();
-            string playerFeedsUrl = $"{_baseUrl}/players";
+            string playerFeedsUrl = "https://www.basketball-reference.com/players";
 
             using (var playerFeedsDocument = await browsingContext.OpenAsync(playerFeedsUrl))
             {
