@@ -36,9 +36,9 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public virtual async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
         {
-            var browsingContext = GetBrowsingContext();
             string playerFeedsUrl = "https://www.basketball-reference.com/players";
 
+            using (var browsingContext = GetBrowsingContext())
             using (var playerFeedsDocument = await browsingContext.OpenAsync(playerFeedsUrl))
             {
                 var playerFeeds = playerFeedsDocument
@@ -60,8 +60,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public virtual async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
         {
-            var browsingContext = GetBrowsingContext();
-
+            using (var browsingContext = GetBrowsingContext())
             using (var playerFeedDocument = await browsingContext.OpenAsync(playerFeed.Url))
             {
                 var players = new List<Player>();
@@ -108,9 +107,9 @@ namespace BBallGraphs.Scrapers.BasketballReference
 
         public virtual async Task<IReadOnlyList<Game>> GetGames(IPlayer player, int season)
         {
-            var browsingContext = GetBrowsingContext();
             string gameLogUrl = player.GetGameLogUrl(season);
 
+            using (var browsingContext = GetBrowsingContext())
             using (var gameLogDocument = await browsingContext.OpenAsync(gameLogUrl))
             {
                 var regularSeasonGameRows = gameLogDocument
