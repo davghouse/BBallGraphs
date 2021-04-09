@@ -452,5 +452,31 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.AreEqual(1, mergedGameData.FreeThrowsMade);
             Assert.AreEqual(2, mergedGameData.FreeThrowsAttempted);
         }
+
+        [TestMethod]
+        public async Task GetGamesForAPlayerWhoPlayedInADoubleheader()
+        {
+            var scraper = new Scraper(_transparentUserAgent);
+            var player = new Player
+            {
+                ID = "bemorir01",
+                FeedUrl = "https://www.basketball-reference.com/players/b/",
+                Name = "Irv Bemoras",
+                FirstSeason = 1954,
+                LastSeason = 1957,
+                BirthDate = new DateTime(1930, 11, 18).AsUtc()
+            };
+            var games = await scraper.GetGames(player, 1954);
+
+            Assert.AreEqual(68, games.Count);
+            Assert.AreEqual(68, games.Select(g => g.Date).Distinct().Count());
+            Assert.AreEqual(67, games.Select(g => g.Date.Date).Distinct().Count());
+            Assert.AreEqual("bemorir01 3/8/1954", games[64].ID);
+            Assert.AreEqual("bemorir01 3/8/1954 2", games[65].ID);
+            Assert.AreEqual(9, games[64].Points);
+            Assert.AreEqual(13, games[65].Points);
+            Assert.AreEqual(games[64].Date.AddHours(3), games[65].Date);
+            Assert.AreEqual(506, games.Sum(g => g.Points));
+        }
     }
 }

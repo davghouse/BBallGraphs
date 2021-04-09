@@ -40,9 +40,6 @@ namespace BBallGraphs.Scrapers.BasketballReference
         public override string ToString()
             => $"On {Date:d}, {PlayerName} had {Points}/{TotalRebounds}/{Assists}";
 
-        // There are a few instances of players playing for both teams in a game. In that case the game data
-        // is split into two rows on basketball-reference. We're not concerned about distinguishing which part
-        // of their performance came for which team, so this merges the data together.
         public static Game MergeSplitGameData(Game firstGameData, Game secondGameData)
         {
             if (firstGameData.PlayerID != secondGameData.PlayerID

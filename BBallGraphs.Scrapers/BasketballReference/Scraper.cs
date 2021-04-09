@@ -168,6 +168,16 @@ namespace BBallGraphs.Scrapers.BasketballReference
                     game.ID = $"{player.ID} {game.Date:d}";
                     game.AgeInDays = (int)(game.Date - player.BirthDate).TotalDays;
 
+                    // This box score is the second game of the only doubleheader in NBA history (that we know about so far).
+                    if (game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195403082MLH.html")
+                    {
+                        game.ID = $"{game.ID} 2";
+                        game.Date = game.Date.AddHours(3);
+                    }
+
+                    // There are a few instances of players playing for both teams in a game. In that case the game data
+                    // is split into two rows on basketball-reference. We're not concerned about distinguishing which part
+                    // of their performance came for which team, so this merges the data together.
                     if (season == 1979
                         && (player.ID == "moneyer01" || player.ID == "simpsra01" || player.ID == "catchha01")
                         && game.Date == new DateTime(1978, 11, 8).AsUtc()
