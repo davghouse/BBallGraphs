@@ -168,15 +168,10 @@ namespace BBallGraphs.Scrapers.BasketballReference
                     game.ID = $"{player.ID} {game.Date:d}";
                     game.AgeInDays = (int)(game.Date - player.BirthDate).TotalDays;
 
-                    // This box score is the second game of the only doubleheader in NBA history.
-                    if (game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195403082MLH.html")
-                    {
-                        game.ID = $"{game.ID} 2";
-                        game.Date = game.Date.AddHours(3);
-                    }
-
-                    // This guy was playing concurrently on two different teams, and played a game for each on the same day.
-                    if (player.ID == "fitzgbo01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194702210TRH.html")
+                        // This box score is the second game of the only doubleheader in NBA history.
+                    if (game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195403082MLH.html"
+                        // This guy was playing concurrently on two different teams, and played a game for each on the same day.
+                        || player.ID == "fitzgbo01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194702210TRH.html")
                     {
                         game.ID = $"{game.ID} 2";
                         game.Date = game.Date.AddHours(3);
