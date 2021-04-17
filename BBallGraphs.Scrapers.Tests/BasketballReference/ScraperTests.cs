@@ -503,5 +503,29 @@ namespace BBallGraphs.Scrapers.Tests.BasketballReference
             Assert.AreEqual(29, regularSeasonGames.Where(g => g.Team == "NYK").Count());
             Assert.AreEqual(5, playoffGames.Where(g => g.Team == "NYK").Count());
         }
+
+        [TestMethod]
+        public async Task GetGamesForAPlayerWithNullPointsCell()
+        {
+            var scraper = new Scraper(_transparentUserAgent);
+            var player = new Player
+            {
+                ID = "heanebr01",
+                FeedUrl = "https://www.basketball-reference.com/players/h/",
+                Name = "Brian Heaney",
+                FirstSeason = 1970,
+                LastSeason = 1970,
+                BirthDate = new DateTime(1946, 9, 3).AsUtc()
+            };
+
+            var games = await scraper.GetGames(player, 1970);
+            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
+            var playoffGames = games.Where(g => g.IsPlayoffGame);
+
+            Assert.AreEqual(14, regularSeasonGames.Count());
+            Assert.AreEqual(6, playoffGames.Count());
+            Assert.AreEqual(28, regularSeasonGames.Sum(g => g.Points));
+            Assert.AreEqual(0, playoffGames.Sum(g => g.Points));
+        }
     }
 }
