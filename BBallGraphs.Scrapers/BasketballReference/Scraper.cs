@@ -161,8 +161,9 @@ namespace BBallGraphs.Scrapers.BasketballReference
                         Blocks = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "blk")?.TextContent),
                         Turnovers = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "tov")?.TextContent),
                         PersonalFouls = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "pf").TextContent),
-                        // Points is almost always filled in with 0 if the player didn't score any points in a game. Some random
-                        // exceptions where it's not filled in are just meaningless inconsistencies in how bball ref displays data.
+                        // Points is almost always filled in with 0 if the player didn't score in a game. Going to assume
+                        // the rare exceptions where points is left blank are just meaningless inconsistencies in how bball
+                        // ref displays 0, rather than true nulls that indicate missing data (like for steals & blocks).
                         Points = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "pts").TextContent) ?? 0,
                         GameScore = NullableHelper.TryParseDouble(GetStatCell(gameRowCells, "game_score")?.TextContent),
                         PlusMinus = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "plus_minus")?.TextContent)
