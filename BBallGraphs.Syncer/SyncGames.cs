@@ -1,4 +1,4 @@
-using BBallGraphs.Scrapers.BasketballReference;
+using BBallGraphs.BasketballReferenceScraper;
 using BBallGraphs.Syncer.SyncResults;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;

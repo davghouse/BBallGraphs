@@ -3,14 +3,14 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using AngleSharp.Io;
-using BBallGraphs.Scrapers.Helpers;
+using BBallGraphs.BasketballReferenceScraper.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Scrapers.BasketballReference
+namespace BBallGraphs.BasketballReferenceScraper
 {
     public class Scraper
     {
@@ -196,7 +196,7 @@ namespace BBallGraphs.Scrapers.BasketballReference
                     }
                 }
 
-                if (games.Count > 110 /* 82 + 7*4, more are technically possible if traded but let's ignore that. */
+                if (games.Count > 110 /* 82 + 7*4, more are technically possible if traded, but let's ignore that. */
                     || games.Count(g => g.IsHomeGame) > 70
                     || games.Count(g => g.IsPlayoffGame) > 28
                     || games.Count != games.Select(g => g.Date).Distinct().Count()

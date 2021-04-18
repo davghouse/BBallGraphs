@@ -1,11 +1,10 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
-using BBallGraphs.Scrapers.Helpers;
+﻿using BBallGraphs.BasketballReferenceScraper.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Scrapers.Tests.BasketballReference
+namespace BBallGraphs.BasketballReferenceScraper.Tests
 {
     [TestClass]
     public class ScraperTests

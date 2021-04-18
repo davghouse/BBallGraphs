@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BBallGraphs.Scrapers.BasketballReference
+namespace BBallGraphs.BasketballReferenceScraper
 {
     public class Player : IPlayer
     {

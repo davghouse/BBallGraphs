@@ -1,4 +1,4 @@
-﻿namespace BBallGraphs.Scrapers.Helpers
+﻿namespace BBallGraphs.BasketballReferenceScraper.Helpers
 {
     public static class NullableHelper
     {

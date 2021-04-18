@@ -1,7 +1,7 @@
-﻿using BBallGraphs.Scrapers.Helpers;
+﻿using BBallGraphs.BasketballReferenceScraper.Helpers;
 using System;
 
-namespace BBallGraphs.Scrapers.BasketballReference
+namespace BBallGraphs.BasketballReferenceScraper
 {
     public class Game : IGame
     {

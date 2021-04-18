@@ -1,8 +1,8 @@
-﻿using BBallGraphs.Scrapers.Helpers;
+﻿using BBallGraphs.BasketballReferenceScraper.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace BBallGraphs.Scrapers.Tests.Helpers
+namespace BBallGraphs.BasketballReferenceScraper.Tests.Helpers
 {
     [TestClass]
     public class DateTimeHelperTests
@@ -17,6 +17,5 @@ namespace BBallGraphs.Scrapers.Tests.Helpers
             Assert.AreEqual(nowUtc.TimeOfDay, nowUtc.AsUtc().TimeOfDay);
             Assert.AreEqual(DateTimeKind.Utc, nowLocal.AsUtc().Kind);
         }
-
     }
 }

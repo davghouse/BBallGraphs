@@ -1,4 +1,4 @@
-﻿namespace BBallGraphs.Scrapers.BasketballReference
+﻿namespace BBallGraphs.BasketballReferenceScraper
 {
     public class PlayerFeed : IPlayerFeed
     {

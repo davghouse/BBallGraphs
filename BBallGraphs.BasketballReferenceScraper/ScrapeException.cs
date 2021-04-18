@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace BBallGraphs.Scrapers
+namespace BBallGraphs.BasketballReferenceScraper
 {
     [Serializable]
     public class ScrapeException : Exception

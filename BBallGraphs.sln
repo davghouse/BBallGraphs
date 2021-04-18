@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Scrapers", "BBallGraphs.Scrapers\BBallGraphs.Scrapers.csproj", "{E7FC0639-67A5-4663-8561-8BD164D3F67B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.BasketballReferenceScraper", "BBallGraphs.BasketballReferenceScraper\BBallGraphs.BasketballReferenceScraper.csproj", "{E7FC0639-67A5-4663-8561-8BD164D3F67B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Scrapers.Tests", "BBallGraphs.Scrapers.Tests\BBallGraphs.Scrapers.Tests.csproj", "{620DD185-BE99-4904-9241-B1D7189F75E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.BasketballReferenceScraper.Tests", "BBallGraphs.BasketballReferenceScraper.Tests\BBallGraphs.BasketballReferenceScraper.Tests.csproj", "{620DD185-BE99-4904-9241-B1D7189F75E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Syncer", "BBallGraphs.Syncer\BBallGraphs.Syncer.csproj", "{1E1554D9-F4B1-478A-8700-482865385A43}"
 EndProject

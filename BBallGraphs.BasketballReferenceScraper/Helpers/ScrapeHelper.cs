@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BBallGraphs.Scrapers.Helpers
+namespace BBallGraphs.BasketballReferenceScraper.Helpers
 {
     public static class ScrapeHelper
     {
@@ -28,9 +28,7 @@ namespace BBallGraphs.Scrapers.Helpers
         }
 
         // Some old players only have birth years listed, in which case January 1st of that year is
-        // assumed. One guy (Dick Lee) doesn't even have a year I can find, so I just made something
-        // up. Their birth years may not be listed alongside birth dates of other players on some
-        // sites like basketball-reference, so I'm hardcoding them here to avoid extra scraping.
+        // assumed. One guy (Dick Lee) doesn't even have a year I can find, so I just made something up.
         public static DateTime GetEstimatedBirthDate(string playerName)
         {
             switch (playerName)

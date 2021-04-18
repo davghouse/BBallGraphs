@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BBallGraphs.Scrapers.Helpers
+namespace BBallGraphs.BasketballReferenceScraper.Helpers
 {
     public static class DateTimeHelper
     {

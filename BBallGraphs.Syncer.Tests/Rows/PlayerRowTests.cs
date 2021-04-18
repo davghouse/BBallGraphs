@@ -1,5 +1,5 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
-using BBallGraphs.Scrapers.Helpers;
+﻿using BBallGraphs.BasketballReferenceScraper;
+using BBallGraphs.BasketballReferenceScraper.Helpers;
 using BBallGraphs.Syncer.Rows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

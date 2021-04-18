@@ -1,4 +1,4 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
+﻿using BBallGraphs.BasketballReferenceScraper;
 using BBallGraphs.Syncer.Rows;
 using System.Collections.Generic;
 using System.Linq;

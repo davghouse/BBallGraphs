@@ -1,4 +1,4 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
+﻿using BBallGraphs.BasketballReferenceScraper;
 using BBallGraphs.Syncer.Rows;
 using BBallGraphs.Syncer.SyncResults;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

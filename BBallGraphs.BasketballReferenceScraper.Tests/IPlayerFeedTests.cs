@@ -1,7 +1,6 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace BBallGraphs.Scrapers.Tests.BasketballReference
+namespace BBallGraphs.BasketballReferenceScraper.Tests
 {
     [TestClass]
     public class IPlayerFeedTests

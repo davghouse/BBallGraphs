@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BBallGraphs.Scrapers\BBallGraphs.Scrapers.csproj" />
+    <ProjectReference Include="..\BBallGraphs.BasketballReferenceScraper\BBallGraphs.BasketballReferenceScraper.csproj" />
     <ProjectReference Include="..\BBallGraphs.Syncer\BBallGraphs.Syncer.csproj" />
   </ItemGroup>
 

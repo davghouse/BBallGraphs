@@ -1,4 +1,4 @@
-﻿using BBallGraphs.Scrapers.BasketballReference;
+﻿using BBallGraphs.BasketballReferenceScraper;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;

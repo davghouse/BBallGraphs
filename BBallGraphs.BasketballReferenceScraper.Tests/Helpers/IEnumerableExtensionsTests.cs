@@ -1,7 +1,7 @@
-﻿using BBallGraphs.Scrapers.Helpers;
+﻿using BBallGraphs.BasketballReferenceScraper.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace BBallGraphs.Scrapers.Tests.Helpers
+namespace BBallGraphs.BasketballReferenceScraper.Tests.Helpers
 {
     [TestClass]
     public class IEnumerableExtensionsTests

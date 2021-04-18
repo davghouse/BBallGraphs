@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BBallGraphs.Scrapers.Helpers
+namespace BBallGraphs.BasketballReferenceScraper.Helpers
 {
     public static class IEnumerableExtensions
     {
