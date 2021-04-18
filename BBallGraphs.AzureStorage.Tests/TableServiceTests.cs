@@ -1,7 +1,7 @@
-﻿using BBallGraphs.BasketballReferenceScraper;
+﻿using BBallGraphs.AzureStorage.Rows;
+using BBallGraphs.AzureStorage.SyncResults;
+using BBallGraphs.BasketballReferenceScraper;
 using BBallGraphs.BasketballReferenceScraper.Helpers;
-using BBallGraphs.Syncer.Rows;
-using BBallGraphs.Syncer.SyncResults;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -10,16 +10,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Syncer.Tests
+namespace BBallGraphs.AzureStorage.Tests
 {
     [TestClass]
-    public class AzureSyncServiceTests
+    public class TableServiceTests
     {
         private static int _tableNameDeduplicator = 0;
         private CloudTable _playerFeedsTable;
         private CloudTable _playersTable;
         private CloudTable _gamesTable;
-        private AzureSyncService _syncService;
+        private TableService _tableService;
 
         [TestInitialize]
         public async Task TestInitialize()
@@ -39,7 +39,7 @@ namespace BBallGraphs.Syncer.Tests
                 $"BBallGraphsGames{Interlocked.Increment(ref _tableNameDeduplicator)}");
             await _gamesTable.CreateIfNotExistsAsync();
 
-            _syncService = new AzureSyncService(_playerFeedsTable, _playersTable, _gamesTable);
+            _tableService = new TableService(_playerFeedsTable, _playersTable, _gamesTable);
         }
 
         [TestCleanup]
@@ -53,15 +53,15 @@ namespace BBallGraphs.Syncer.Tests
         [TestMethod]
         public async Task GetPlayerFeedRows()
         {
-            var playerFeedRows = await _syncService.GetPlayerFeedRows();
+            var playerFeedRows = await _tableService.GetPlayerFeedRows();
             Assert.AreEqual(0, playerFeedRows.Count);
 
             var playerFeeds = Enumerable.Range(1, 50)
                 .Select(i => new PlayerFeed { Url = i.ToString() });
-            var syncResult = new SyncPlayerFeedsResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
-            await _syncService.UpdatePlayerFeedsTable(syncResult);
+            var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
+            await _tableService.UpdatePlayerFeedsTable(syncResult);
 
-            playerFeedRows = await _syncService.GetPlayerFeedRows();
+            playerFeedRows = await _tableService.GetPlayerFeedRows();
             Assert.AreEqual(50, playerFeedRows.Count);
             Assert.IsTrue(playerFeedRows.Zip(playerFeeds, (r, f) => r.Matches(f)).All(m => m));
         }
@@ -72,7 +72,7 @@ namespace BBallGraphs.Syncer.Tests
             var playerFeeds = Enumerable.Range(1, 50)
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var playerRows = await _syncService.GetPlayerRows(playerFeeds[0]);
+            var playerRows = await _tableService.GetPlayerRows(playerFeeds[0]);
             Assert.AreEqual(0, playerRows.Count);
 
             var players = Enumerable.Range(1, 50)
@@ -85,28 +85,28 @@ namespace BBallGraphs.Syncer.Tests
                         FeedUrl = playerFeeds[i - 1].Url,
                     }))
                 .ToArray();
-            var syncResult = new SyncPlayersResult(Enumerable.Empty<PlayerRow>(), players);
-            await _syncService.UpdatePlayersTable(syncResult);
+            var syncResult = new PlayersSyncResult(Enumerable.Empty<PlayerRow>(), players);
+            await _tableService.UpdatePlayersTable(syncResult);
 
-            playerRows = await _syncService.GetPlayerRows(playerFeeds[0]);
+            playerRows = await _tableService.GetPlayerRows(playerFeeds[0]);
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "1-1", "1-2", "1-3", "1-4", "1-5" },
                 playerRows.Select(r => r.ID).ToArray());
 
-            playerRows = await _syncService.GetPlayerRows(playerFeeds[1]);
+            playerRows = await _tableService.GetPlayerRows(playerFeeds[1]);
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "2-1", "2-2", "2-3", "2-4", "2-5" },
                 playerRows.Select(r => r.ID).ToArray());
 
-            playerRows = await _syncService.GetPlayerRows(playerFeeds[49]);
+            playerRows = await _tableService.GetPlayerRows(playerFeeds[49]);
             Assert.AreEqual(5, playerRows.Count);
             CollectionAssert.AreEquivalent(
                 new[] { "50-1", "50-2", "50-3", "50-4", "50-5" },
                 playerRows.Select(r => r.ID).ToArray());
 
-            playerRows = await _syncService.GetPlayerRows(new PlayerFeed { Url = "51" });
+            playerRows = await _tableService.GetPlayerRows(new PlayerFeed { Url = "51" });
             Assert.AreEqual(0, playerRows.Count);
         }
 
@@ -116,7 +116,7 @@ namespace BBallGraphs.Syncer.Tests
             var players = Enumerable.Range(1, 10)
                 .Select(i => new Player { ID = i.ToString(), FirstSeason = 2000, LastSeason = 2010 })
                 .ToArray();
-            var gameRows = await _syncService.GetGameRows(players[0], 2000);
+            var gameRows = await _tableService.GetGameRows(players[0], 2000);
             Assert.AreEqual(0, gameRows.Count);
 
             var games = Enumerable.Range(1, 10)
@@ -129,24 +129,24 @@ namespace BBallGraphs.Syncer.Tests
                         Date = new DateTime(2000 + i - 1, 1, 1).AddDays(j).AsUtc()
                     }))
                 .ToArray();
-            var syncResult = new SyncGamesResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "1"));
-            await _syncService.UpdateGamesTable(syncResult);
-            syncResult = new SyncGamesResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "5"));
-            await _syncService.UpdateGamesTable(syncResult);
+            var syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "1"));
+            await _tableService.UpdateGamesTable(syncResult);
+            syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "5"));
+            await _tableService.UpdateGamesTable(syncResult);
 
-            gameRows = await _syncService.GetGameRows(players[0], 2000);
+            gameRows = await _tableService.GetGameRows(players[0], 2000);
             Assert.AreEqual(110, gameRows.Count);
             CollectionAssert.AreEquivalent(
                 Enumerable.Range(1, 110).Select(i => $"1-{i}").ToArray(),
                 gameRows.Select(r => r.ID).ToArray());
 
-            gameRows = await _syncService.GetGameRows(players[4], 2004);
+            gameRows = await _tableService.GetGameRows(players[4], 2004);
             Assert.AreEqual(110, gameRows.Count);
             CollectionAssert.AreEquivalent(
                 Enumerable.Range(1, 110).Select(i => $"5-{i}").ToArray(),
                 gameRows.Select(r => r.ID).ToArray());
 
-            gameRows = await _syncService.GetGameRows(players[4], 2005);
+            gameRows = await _tableService.GetGameRows(players[4], 2005);
             Assert.AreEqual(0, gameRows.Count);
         }
 
@@ -156,18 +156,18 @@ namespace BBallGraphs.Syncer.Tests
             var playerFeeds = Enumerable.Range(1, 50)
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
-            await _syncService.UpdatePlayerFeedsTable(syncResult);
+            var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
+            await _tableService.UpdatePlayerFeedsTable(syncResult);
 
-            var nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            var nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.IsTrue(playerFeeds[0].Matches(nextPlayerFeedRow));
 
-            var nextPlayerFeedRows = await _syncService.GetNextPlayerFeedRows(2, TimeSpan.Zero);
+            var nextPlayerFeedRows = await _tableService.GetNextPlayerFeedRows(2, TimeSpan.Zero);
             Assert.IsTrue(playerFeeds[0].Matches(nextPlayerFeedRows[0]));
             Assert.IsTrue(playerFeeds[1].Matches(nextPlayerFeedRows[1]));
             Assert.AreEqual(2, nextPlayerFeedRows.Count);
 
-            nextPlayerFeedRows = await _syncService.GetNextPlayerFeedRows(2, TimeSpan.FromDays(1));
+            nextPlayerFeedRows = await _tableService.GetNextPlayerFeedRows(2, TimeSpan.FromDays(1));
             Assert.AreEqual(0, nextPlayerFeedRows.Count);
         }
 
@@ -177,18 +177,18 @@ namespace BBallGraphs.Syncer.Tests
             var players = Enumerable.Range(1, 10)
                 .Select(i => new Player { ID = i.ToString(), BirthDate = DateTime.UtcNow })
                 .ToArray();
-            var syncResult = new SyncPlayersResult(Enumerable.Empty<PlayerRow>(), players);
-            await _syncService.UpdatePlayersTable(syncResult);
+            var syncResult = new PlayersSyncResult(Enumerable.Empty<PlayerRow>(), players);
+            await _tableService.UpdatePlayersTable(syncResult);
 
-            var nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            var nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.IsTrue(players[0].Matches(nextPlayerRow));
 
-            var nextPlayerRows = await _syncService.GetNextPlayerRows(2, TimeSpan.Zero);
+            var nextPlayerRows = await _tableService.GetNextPlayerRows(2, TimeSpan.Zero);
             Assert.IsTrue(players[0].Matches(nextPlayerRows[0]));
             Assert.IsTrue(players[1].Matches(nextPlayerRows[1]));
             Assert.AreEqual(2, nextPlayerRows.Count);
 
-            nextPlayerRows = await _syncService.GetNextPlayerRows(2, TimeSpan.FromDays(1));
+            nextPlayerRows = await _tableService.GetNextPlayerRows(2, TimeSpan.FromDays(1));
             Assert.AreEqual(0, nextPlayerRows.Count);
         }
 
@@ -197,9 +197,9 @@ namespace BBallGraphs.Syncer.Tests
         {
             var playerFeeds = Enumerable.Range(1, 110)
                 .Select(i => new PlayerFeed { Url = i.ToString() });
-            var syncResult = new SyncPlayerFeedsResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
-            await _syncService.UpdatePlayerFeedsTable(syncResult);
-            var playerFeedRows = await _syncService.GetPlayerFeedRows();
+            var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
+            await _tableService.UpdatePlayerFeedsTable(syncResult);
+            var playerFeedRows = await _tableService.GetPlayerFeedRows();
 
             CollectionAssert.AreEquivalent(
                 playerFeeds.Select(f => f.Url).ToArray(),
@@ -209,9 +209,9 @@ namespace BBallGraphs.Syncer.Tests
 
             playerFeeds = Enumerable.Range(1, 112)
                 .Select(i => new PlayerFeed { Url = i.ToString() });
-            syncResult = new SyncPlayerFeedsResult(playerFeedRows, playerFeeds);
-            await _syncService.UpdatePlayerFeedsTable(syncResult);
-            playerFeedRows = await _syncService.GetPlayerFeedRows();
+            syncResult = new PlayerFeedsSyncResult(playerFeedRows, playerFeeds);
+            await _tableService.UpdatePlayerFeedsTable(syncResult);
+            playerFeedRows = await _tableService.GetPlayerFeedRows();
 
             CollectionAssert.AreEquivalent(
                 playerFeeds.Select(f => f.Url).ToArray(),
@@ -237,10 +237,10 @@ namespace BBallGraphs.Syncer.Tests
                         BirthDate = DateTime.UtcNow,
                         FeedUrl = playerFeeds[i - 1].Url,
                     })).ToArray();
-            var syncResult = new SyncPlayersResult(Enumerable.Empty<PlayerRow>(), players);
-            await _syncService.UpdatePlayersTable(syncResult);
+            var syncResult = new PlayersSyncResult(Enumerable.Empty<PlayerRow>(), players);
+            await _tableService.UpdatePlayersTable(syncResult);
 
-            var playerRowsFeed1 = await _syncService.GetPlayerRows(playerFeeds[0]);
+            var playerRowsFeed1 = await _tableService.GetPlayerRows(playerFeeds[0]);
             Assert.AreEqual(5, playerRowsFeed1.Count);
 
             var updatedPlayersFeed1 = playerRowsFeed1.Select(r => new Player
@@ -260,22 +260,22 @@ namespace BBallGraphs.Syncer.Tests
                     FeedUrl = playerFeeds[0].Url,
                 })).ToArray();
 
-            syncResult = new SyncPlayersResult(playerRowsFeed1, updatedPlayersFeed1);
+            syncResult = new PlayersSyncResult(playerRowsFeed1, updatedPlayersFeed1);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(5, syncResult.UpdatedPlayerRows.Count);
             Assert.AreEqual(5, syncResult.NewPlayers.Count);
 
-            await _syncService.UpdatePlayersTable(syncResult);
-            playerRowsFeed1 = await _syncService.GetPlayerRows(playerFeeds[0]);
+            await _tableService.UpdatePlayersTable(syncResult);
+            playerRowsFeed1 = await _tableService.GetPlayerRows(playerFeeds[0]);
             Assert.AreEqual(10, playerRowsFeed1.Count);
             Assert.IsTrue(playerRowsFeed1.Zip(updatedPlayersFeed1, (r, p) => r.Matches(p)).All(m => m));
 
-            syncResult = new SyncPlayersResult(playerRowsFeed1, updatedPlayersFeed1);
+            syncResult = new PlayersSyncResult(playerRowsFeed1, updatedPlayersFeed1);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
             Assert.AreEqual(0, syncResult.NewPlayers.Count);
 
-            var playerRowsFeed5 = await _syncService.GetPlayerRows(playerFeeds[4]);
+            var playerRowsFeed5 = await _tableService.GetPlayerRows(playerFeeds[4]);
             Assert.AreEqual(5, playerRowsFeed5.Count);
 
             var updatedPlayersFeed5 = playerRowsFeed5.Select(r => new Player
@@ -294,14 +294,14 @@ namespace BBallGraphs.Syncer.Tests
                 })).ToArray();
             updatedPlayersFeed5[2].Name += "-updated";
 
-            syncResult = new SyncPlayersResult(playerRowsFeed5, updatedPlayersFeed5);
+            syncResult = new PlayersSyncResult(playerRowsFeed5, updatedPlayersFeed5);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(1, syncResult.UpdatedPlayerRows.Count);
             Assert.AreEqual(1, syncResult.NewPlayers.Count);
 
-            await _syncService.UpdatePlayersTable(syncResult);
-            playerRowsFeed1 = await _syncService.GetPlayerRows(playerFeeds[0]);
-            playerRowsFeed5 = await _syncService.GetPlayerRows(playerFeeds[4]);
+            await _tableService.UpdatePlayersTable(syncResult);
+            playerRowsFeed1 = await _tableService.GetPlayerRows(playerFeeds[0]);
+            playerRowsFeed5 = await _tableService.GetPlayerRows(playerFeeds[4]);
             Assert.AreEqual(10, playerRowsFeed1.Count);
             Assert.IsTrue(playerRowsFeed1.Zip(updatedPlayersFeed1, (r, p) => r.Matches(p)).All(m => m));
             Assert.AreEqual(6, playerRowsFeed5.Count);
@@ -326,12 +326,12 @@ namespace BBallGraphs.Syncer.Tests
                         Points = 10,
                         TotalRebounds = 5
                     })).ToArray();
-            var syncResult = new SyncGamesResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "1"));
-            await _syncService.UpdateGamesTable(syncResult);
-            syncResult = new SyncGamesResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "5"));
-            await _syncService.UpdateGamesTable(syncResult);
+            var syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "1"));
+            await _tableService.UpdateGamesTable(syncResult);
+            syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games.Where(g => g.PlayerID == "5"));
+            await _tableService.UpdateGamesTable(syncResult);
 
-            var gameRowsPlayer1Season2000 = await _syncService.GetGameRows(players[0], 2000);
+            var gameRowsPlayer1Season2000 = await _tableService.GetGameRows(players[0], 2000);
             Assert.AreEqual(110, gameRowsPlayer1Season2000.Count);
 
             var updatedGamesPlayer1 = gameRowsPlayer1Season2000.Select(r => new Game
@@ -353,31 +353,31 @@ namespace BBallGraphs.Syncer.Tests
                     TotalRebounds = 10
                 })).ToArray();
 
-            syncResult = new SyncGamesResult(gameRowsPlayer1Season2000, updatedGamesPlayer1);
+            syncResult = new GamesSyncResult(gameRowsPlayer1Season2000, updatedGamesPlayer1);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(110, syncResult.UpdatedGameRows.Count);
             Assert.AreEqual(80, syncResult.NewGames.Count);
 
-            await _syncService.UpdateGamesTable(syncResult);
-            gameRowsPlayer1Season2000 = await _syncService.GetGameRows(players[0], 2000);
-            var gameRowsPlayer1Season2001 = await _syncService.GetGameRows(players[0], 2001);
+            await _tableService.UpdateGamesTable(syncResult);
+            gameRowsPlayer1Season2000 = await _tableService.GetGameRows(players[0], 2000);
+            var gameRowsPlayer1Season2001 = await _tableService.GetGameRows(players[0], 2001);
             Assert.AreEqual(110, gameRowsPlayer1Season2000.Count);
             Assert.AreEqual(80, gameRowsPlayer1Season2001.Count);
             Assert.IsTrue(gameRowsPlayer1Season2000.Zip(updatedGamesPlayer1.Where(g => g.Season == 2000), (r, g) => r.Matches(g)).All(m => m));
             Assert.IsTrue(gameRowsPlayer1Season2001.Zip(updatedGamesPlayer1.Where(g => g.Season == 2001), (r, g) => r.Matches(g)).All(m => m));
 
-            syncResult = new SyncGamesResult(gameRowsPlayer1Season2000.Concat(gameRowsPlayer1Season2001), updatedGamesPlayer1);
+            syncResult = new GamesSyncResult(gameRowsPlayer1Season2000.Concat(gameRowsPlayer1Season2001), updatedGamesPlayer1);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.AreEqual(0, syncResult.NewGames.Count);
 
-            var gameRowsPlayer4Season2000 = await _syncService.GetGameRows(players[3], 2000);
+            var gameRowsPlayer4Season2000 = await _tableService.GetGameRows(players[3], 2000);
             Assert.AreEqual(0, gameRowsPlayer4Season2000.Count);
 
-            var gameRowsPlayer5Season2000 = await _syncService.GetGameRows(players[4], 2000);
+            var gameRowsPlayer5Season2000 = await _tableService.GetGameRows(players[4], 2000);
             Assert.AreEqual(0, gameRowsPlayer5Season2000.Count);
 
-            var gameRowsPlayer5Season2004 = await _syncService.GetGameRows(players[4], 2004);
+            var gameRowsPlayer5Season2004 = await _tableService.GetGameRows(players[4], 2004);
             Assert.AreEqual(110, gameRowsPlayer5Season2004.Count);
 
             var updatedGamesPlayer5 = gameRowsPlayer5Season2004.Select((r, i) => new Game
@@ -399,16 +399,16 @@ namespace BBallGraphs.Syncer.Tests
                     TotalRebounds = 10
                 })).ToArray();
 
-            syncResult = new SyncGamesResult(gameRowsPlayer5Season2004, updatedGamesPlayer5);
+            syncResult = new GamesSyncResult(gameRowsPlayer5Season2004, updatedGamesPlayer5);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(55, syncResult.UpdatedGameRows.Count);
             Assert.AreEqual(80, syncResult.NewGames.Count);
 
-            await _syncService.UpdateGamesTable(syncResult);
-            gameRowsPlayer1Season2000 = await _syncService.GetGameRows(players[0], 2000);
-            gameRowsPlayer1Season2001 = await _syncService.GetGameRows(players[0], 2001);
-            gameRowsPlayer5Season2004 = await _syncService.GetGameRows(players[4], 2004);
-            var gameRowsPlayer5Season2005 = await _syncService.GetGameRows(players[4], 2005);
+            await _tableService.UpdateGamesTable(syncResult);
+            gameRowsPlayer1Season2000 = await _tableService.GetGameRows(players[0], 2000);
+            gameRowsPlayer1Season2001 = await _tableService.GetGameRows(players[0], 2001);
+            gameRowsPlayer5Season2004 = await _tableService.GetGameRows(players[4], 2004);
+            var gameRowsPlayer5Season2005 = await _tableService.GetGameRows(players[4], 2005);
             Assert.AreEqual(110, gameRowsPlayer1Season2000.Count);
             Assert.AreEqual(80, gameRowsPlayer1Season2001.Count);
             Assert.AreEqual(110, gameRowsPlayer5Season2004.Count);
@@ -419,7 +419,7 @@ namespace BBallGraphs.Syncer.Tests
             Assert.IsTrue(gameRowsPlayer5Season2005.Zip(updatedGamesPlayer5.Where(g => g.Season == 2005), (r, g) => r.Matches(g)).All(m => m));
             Assert.AreEqual(syncResult.UpdatedGameRows.OrderBy(r => r.ID).First().RowKey, gameRowsPlayer5Season2004.OrderBy(r => r.ID).First().RowKey);
 
-            syncResult = new SyncGamesResult(gameRowsPlayer5Season2004.Concat(gameRowsPlayer5Season2005), updatedGamesPlayer5);
+            syncResult = new GamesSyncResult(gameRowsPlayer5Season2004.Concat(gameRowsPlayer5Season2005), updatedGamesPlayer5);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.AreEqual(0, syncResult.NewGames.Count);
@@ -431,40 +431,40 @@ namespace BBallGraphs.Syncer.Tests
             var playerFeeds = Enumerable.Range(1, 3)
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
-            await _syncService.UpdatePlayerFeedsTable(syncResult);
+            var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
+            await _tableService.UpdatePlayerFeedsTable(syncResult);
 
-            var nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            var nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerFeedRow.Url);
             Assert.IsNull(nextPlayerFeedRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerFeedRow.LastSyncWithChangesTimeUtc);
 
-            await _syncService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: false);
-            nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: false);
+            nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("2", nextPlayerFeedRow.Url);
             Assert.IsNull(nextPlayerFeedRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerFeedRow.LastSyncWithChangesTimeUtc);
 
-            await _syncService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
-            nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
+            nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("3", nextPlayerFeedRow.Url);
             Assert.IsNull(nextPlayerFeedRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerFeedRow.LastSyncWithChangesTimeUtc);
 
-            await _syncService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
-            nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
+            nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerFeedRow.Url);
             Assert.IsNotNull(nextPlayerFeedRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerFeedRow.LastSyncWithChangesTimeUtc);
 
-            await _syncService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
-            nextPlayerFeedRow = (await _syncService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
+            nextPlayerFeedRow = (await _tableService.GetNextPlayerFeedRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("2", nextPlayerFeedRow.Url);
             Assert.IsNotNull(nextPlayerFeedRow.LastSyncTimeUtc);
             Assert.IsNotNull(nextPlayerFeedRow.LastSyncWithChangesTimeUtc);
 
-            await _syncService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
-            var nextPlayerFeedRows = await _syncService.GetNextPlayerFeedRows(3, TimeSpan.Zero);
+            await _tableService.RequeuePlayerFeedRow(nextPlayerFeedRow, syncFoundChanges: true);
+            var nextPlayerFeedRows = await _tableService.GetNextPlayerFeedRows(3, TimeSpan.Zero);
             CollectionAssert.AreEqual(
                 new[] { "3", "1", "2" },
                 nextPlayerFeedRows.Select(r => r.Url).ToArray());
@@ -484,61 +484,61 @@ namespace BBallGraphs.Syncer.Tests
                     BirthDate = DateTime.UtcNow.AddYears(-25)
                 })
                 .ToArray();
-            var syncResult = new SyncPlayersResult(Enumerable.Empty<PlayerRow>(), players);
-            await _syncService.UpdatePlayersTable(syncResult);
+            var syncResult = new PlayersSyncResult(Enumerable.Empty<PlayerRow>(), players);
+            await _tableService.UpdatePlayersTable(syncResult);
 
-            var nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            var nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerRow.ID);
             Assert.IsNull(nextPlayerRow.LastSyncSeason);
             Assert.IsNull(nextPlayerRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerRow.LastSyncWithChangesTimeUtc);
             Assert.AreEqual(nextPlayerRow.FirstSeason, nextPlayerRow.GetNextSyncSeason());
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: false);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: false);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("2", nextPlayerRow.ID);
             Assert.IsNull(nextPlayerRow.LastSyncSeason);
             Assert.IsNull(nextPlayerRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerRow.LastSyncWithChangesTimeUtc);
             Assert.AreEqual(nextPlayerRow.FirstSeason, nextPlayerRow.GetNextSyncSeason());
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("3", nextPlayerRow.ID);
             Assert.IsNull(nextPlayerRow.LastSyncSeason);
             Assert.IsNull(nextPlayerRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerRow.LastSyncWithChangesTimeUtc);
             Assert.AreEqual(nextPlayerRow.FirstSeason, nextPlayerRow.GetNextSyncSeason());
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerRow.ID);
             Assert.AreEqual(nextPlayerRow.FirstSeason, nextPlayerRow.LastSyncSeason);
             Assert.IsNotNull(nextPlayerRow.LastSyncTimeUtc);
             Assert.IsNull(nextPlayerRow.LastSyncWithChangesTimeUtc);
             Assert.AreEqual(nextPlayerRow.FirstSeason + 1, nextPlayerRow.GetNextSyncSeason());
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("2", nextPlayerRow.ID);
             Assert.AreEqual(nextPlayerRow.FirstSeason, nextPlayerRow.LastSyncSeason);
             Assert.IsNotNull(nextPlayerRow.LastSyncTimeUtc);
             Assert.IsNotNull(nextPlayerRow.LastSyncWithChangesTimeUtc);
             Assert.AreEqual(nextPlayerRow.FirstSeason + 1, nextPlayerRow.GetNextSyncSeason());
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            var nextPlayerRows = await _syncService.GetNextPlayerRows(3, TimeSpan.Zero);
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            var nextPlayerRows = await _tableService.GetNextPlayerRows(3, TimeSpan.Zero);
             CollectionAssert.AreEqual(
                 new[] { "3", "1", "2" },
                 nextPlayerRows.Select(r => r.ID).ToArray());
 
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("3", nextPlayerRow.ID);
 
             nextPlayerRow.FirstSeason = 2000;
             nextPlayerRow.LastSeason = 2010;
-            await _syncService.RequeuePlayerRow(nextPlayerRow, 2010, syncFoundChanges: true);
-            var playerRows = await _syncService.GetPlayerRows(playerFeed);
+            await _tableService.RequeuePlayerRow(nextPlayerRow, 2010, syncFoundChanges: true);
+            var playerRows = await _tableService.GetPlayerRows(playerFeed);
             Assert.AreEqual("1", playerRows[0].ID);
             Assert.AreEqual("2", playerRows[1].ID);
             Assert.AreEqual("3", playerRows[2].ID);
@@ -546,15 +546,15 @@ namespace BBallGraphs.Syncer.Tests
             Assert.AreEqual(playerRows[1].FirstSeason + 2, playerRows[1].GetNextSyncSeason());
             Assert.AreEqual(playerRows[2].FirstSeason, playerRows[2].GetNextSyncSeason());
 
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerRow.ID);
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("2", nextPlayerRow.ID);
 
-            await _syncService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
-            nextPlayerRow = (await _syncService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
+            await _tableService.RequeuePlayerRow(nextPlayerRow, nextPlayerRow.GetNextSyncSeason(), syncFoundChanges: true);
+            nextPlayerRow = (await _tableService.GetNextPlayerRows(1, TimeSpan.Zero)).Single();
             Assert.AreEqual("1", nextPlayerRow.ID); // 3 has been deprioritized.
         }
     }

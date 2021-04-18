@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace BBallGraphs.Syncer
+namespace BBallGraphs.AzureStorage
 {
     [Serializable]
     public class SyncException : Exception

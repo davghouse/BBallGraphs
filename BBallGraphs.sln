@@ -16,9 +16,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.BasketballRefer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Syncer", "BBallGraphs.Syncer\BBallGraphs.Syncer.csproj", "{1E1554D9-F4B1-478A-8700-482865385A43}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.Syncer.Tests", "BBallGraphs.Syncer.Tests\BBallGraphs.Syncer.Tests.csproj", "{B627D642-4227-46EE-B9AF-6046B168BEFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.AzureStorage.Tests", "BBallGraphs.AzureStorage.Tests\BBallGraphs.AzureStorage.Tests.csproj", "{B627D642-4227-46EE-B9AF-6046B168BEFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBallGraphs.BlobBuilder", "BBallGraphs.BlobBuilder\BBallGraphs.BlobBuilder.csproj", "{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.BlobBuilder", "BBallGraphs.BlobBuilder\BBallGraphs.BlobBuilder.csproj", "{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBallGraphs.AzureStorage", "BBallGraphs.AzureStorage\BBallGraphs.AzureStorage.csproj", "{66D4B595-048D-4C10-B4FD-9A853786B7DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66D4B595-048D-4C10-B4FD-9A853786B7DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66D4B595-048D-4C10-B4FD-9A853786B7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66D4B595-048D-4C10-B4FD-9A853786B7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66D4B595-048D-4C10-B4FD-9A853786B7DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

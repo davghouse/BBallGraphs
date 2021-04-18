@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BBallGraphs.Syncer.Rows
+namespace BBallGraphs.AzureStorage.Rows
 {
     public class GameRow : TableEntity, IGame
     {

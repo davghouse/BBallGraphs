@@ -1,5 +1,6 @@
+using BBallGraphs.AzureStorage;
+using BBallGraphs.AzureStorage.SyncResults;
 using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.SyncResults;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,10 +17,10 @@ namespace BBallGraphs.Syncer
             [TimerTrigger("0 */3 0-7,20-23 * * *")]TimerInfo timer,
             ILogger log)
         {
-            var syncService = new AzureSyncService();
+            var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
 
-            var playerRow = (await syncService.GetNextPlayerRows(
+            var playerRow = (await tableService.GetNextPlayerRows(
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
             log.LogInformation("Queried players table for next player: " +
@@ -28,13 +29,13 @@ namespace BBallGraphs.Syncer
 
             int syncSeason = playerRow.GetNextSyncSeason();
 
-            var gameRows = await syncService.GetGameRows(playerRow, syncSeason);
+            var gameRows = await tableService.GetGameRows(playerRow, syncSeason);
             log.LogInformation($"Queried games table for {playerRow.Name}'s {syncSeason} season: {gameRows.Count} rows returned.");
 
             var games = await scraper.GetGames(playerRow, syncSeason);
             log.LogInformation($"Scraped games for {playerRow.Name}'s {syncSeason} season: {games.Count} found.");
 
-            var syncResult = new SyncGamesResult(gameRows, games);
+            var syncResult = new GamesSyncResult(gameRows, games);
 
             if (syncResult.DefunctGameRows.Any())
                 throw new SyncException("Defunct game rows found, manual intervention required: " +
@@ -55,11 +56,11 @@ namespace BBallGraphs.Syncer
 
             if (syncResult.FoundChanges)
             {
-                await syncService.UpdateGamesTable(syncResult);
+                await tableService.UpdateGamesTable(syncResult);
                 log.LogInformation("Games table updated.");
             }
 
-            await syncService.RequeuePlayerRow(playerRow, syncSeason, syncResult.FoundChanges);
+            await tableService.RequeuePlayerRow(playerRow, syncSeason, syncResult.FoundChanges);
             log.LogInformation("Player row requeued.");
         }
     }

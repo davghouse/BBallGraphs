@@ -1,13 +1,13 @@
-﻿using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.Rows;
+﻿using BBallGraphs.AzureStorage.Rows;
+using BBallGraphs.BasketballReferenceScraper;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BBallGraphs.Syncer.SyncResults
+namespace BBallGraphs.AzureStorage.SyncResults
 {
-    public class SyncPlayerFeedsResult
+    public class PlayerFeedsSyncResult
     {
-        public SyncPlayerFeedsResult(
+        public PlayerFeedsSyncResult(
             IEnumerable<PlayerFeedRow> playerFeedRows,
             IEnumerable<PlayerFeed> playerFeeds)
         {

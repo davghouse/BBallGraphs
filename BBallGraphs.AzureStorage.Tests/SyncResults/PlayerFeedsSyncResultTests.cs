@@ -1,13 +1,13 @@
-﻿using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.Rows;
-using BBallGraphs.Syncer.SyncResults;
+﻿using BBallGraphs.AzureStorage.Rows;
+using BBallGraphs.AzureStorage.SyncResults;
+using BBallGraphs.BasketballReferenceScraper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace BBallGraphs.Syncer.Tests.SyncResults
+namespace BBallGraphs.AzureStorage.Tests.SyncResults
 {
     [TestClass]
-    public class SyncPlayerFeedsResultTests
+    public class PlayerFeedsSyncResultTests
     {
         [TestMethod]
         public void FindsChanges()
@@ -18,7 +18,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
             var playerFeeds = new[] { 0, 1, 2, 3, 6, 7, 8, 10, 11 }
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(playerFeedRows, playerFeeds);
+            var syncResult = new PlayerFeedsSyncResult(playerFeedRows, playerFeeds);
 
             CollectionAssert.AreEquivalent(
                 playerFeedRows.Where(r => r.Url == "4" || r.Url == "5" || r.Url == "9").ToArray(),
@@ -38,7 +38,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
             var playerFeeds = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(playerFeedRows, playerFeeds);
+            var syncResult = new PlayerFeedsSyncResult(playerFeedRows, playerFeeds);
 
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);
             Assert.AreEqual(0, syncResult.NewPlayerFeeds.Count);
@@ -51,7 +51,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
             var playerFeedRows = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
                 .Select(i => new PlayerFeedRow { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(playerFeedRows, Enumerable.Empty<PlayerFeed>());
+            var syncResult = new PlayerFeedsSyncResult(playerFeedRows, Enumerable.Empty<PlayerFeed>());
 
             CollectionAssert.AreEqual(playerFeedRows, syncResult.DefunctPlayerFeedRows.ToArray());
             Assert.AreEqual(0, syncResult.NewPlayerFeeds.Count);
@@ -64,7 +64,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
             var playerFeeds = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
                 .Select(i => new PlayerFeed { Url = i.ToString() })
                 .ToArray();
-            var syncResult = new SyncPlayerFeedsResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
+            var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
 
             CollectionAssert.AreEqual(playerFeeds, syncResult.NewPlayerFeeds.ToArray());
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);
@@ -74,7 +74,7 @@ namespace BBallGraphs.Syncer.Tests.SyncResults
         [TestMethod]
         public void DoesntFindChangesWhenAllEmpty()
         {
-            var syncResult = new SyncPlayerFeedsResult(
+            var syncResult = new PlayerFeedsSyncResult(
                 Enumerable.Empty<PlayerFeedRow>(), Enumerable.Empty<PlayerFeed>());
 
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);

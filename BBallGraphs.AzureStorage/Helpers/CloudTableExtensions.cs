@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Syncer.Helpers
+namespace BBallGraphs.AzureStorage.Helpers
 {
     public static class CloudTableExtensions
     {

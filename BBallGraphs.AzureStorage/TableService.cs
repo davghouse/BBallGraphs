@@ -1,7 +1,7 @@
-﻿using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.Helpers;
-using BBallGraphs.Syncer.Rows;
-using BBallGraphs.Syncer.SyncResults;
+﻿using BBallGraphs.AzureStorage.Helpers;
+using BBallGraphs.AzureStorage.Rows;
+using BBallGraphs.AzureStorage.SyncResults;
+using BBallGraphs.BasketballReferenceScraper;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -9,26 +9,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BBallGraphs.Syncer
+namespace BBallGraphs.AzureStorage
 {
-    public class AzureSyncService
+    public class TableService
     {
         private const int _batchOperationLimit = 100; // Azure's limit
         private readonly CloudTable _playerFeedsTable;
         private readonly CloudTable _playersTable;
         private readonly CloudTable _gamesTable;
 
-        public AzureSyncService()
+        public TableService(string azureStorageConnectionString,
+            string playerFeedsTableName = "BBallGraphsPlayerFeeds",
+            string playersTableName = "BBallGraphsPlayers",
+            string gamesTableName = "BBallGraphsGames")
         {
-            var account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+            var account = CloudStorageAccount.Parse(azureStorageConnectionString);
             var tableClient = account.CreateCloudTableClient();
 
-            _playerFeedsTable = tableClient.GetTableReference("BBallGraphsPlayerFeeds");
-            _playersTable = tableClient.GetTableReference("BBallGraphsPlayers");
-            _gamesTable = tableClient.GetTableReference("BBallGraphsGames");
+            _playerFeedsTable = tableClient.GetTableReference(playerFeedsTableName);
+            _playersTable = tableClient.GetTableReference(playersTableName);
+            _gamesTable = tableClient.GetTableReference(gamesTableName);
         }
 
-        public AzureSyncService(CloudTable playerFeedsTable, CloudTable playersTable, CloudTable gamesTable)
+        public TableService(CloudTable playerFeedsTable, CloudTable playersTable, CloudTable gamesTable)
         {
             _playerFeedsTable = playerFeedsTable;
             _playersTable = playersTable;
@@ -103,7 +106,7 @@ namespace BBallGraphs.Syncer
                 .ToArray();
         }
 
-        public async Task UpdatePlayerFeedsTable(SyncPlayerFeedsResult syncResult)
+        public async Task UpdatePlayerFeedsTable(PlayerFeedsSyncResult syncResult)
         {
             if (syncResult.DefunctPlayerFeedRows.Any())
                 throw new SyncException("Defunct player feed rows, manual intervention required.");
@@ -125,7 +128,7 @@ namespace BBallGraphs.Syncer
             await Task.WhenAll(batchTasks);
         }
 
-        public async Task UpdatePlayersTable(SyncPlayersResult syncResult)
+        public async Task UpdatePlayersTable(PlayersSyncResult syncResult)
         {
             if (syncResult.DefunctPlayerRows.Any())
                 throw new SyncException("Defunct player rows, manual intervention required.");
@@ -148,7 +151,7 @@ namespace BBallGraphs.Syncer
             await Task.WhenAll(batchTasks);
         }
 
-        public async Task UpdateGamesTable(SyncGamesResult syncResult)
+        public async Task UpdateGamesTable(GamesSyncResult syncResult)
         {
             if (syncResult.DefunctGameRows.Any())
                 throw new SyncException("Defunct game rows, manual intervention required.");

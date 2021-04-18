@@ -1,5 +1,6 @@
+using BBallGraphs.AzureStorage;
+using BBallGraphs.AzureStorage.SyncResults;
 using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.SyncResults;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,16 +17,16 @@ namespace BBallGraphs.Syncer
             [TimerTrigger("0 0 17 * * *")]TimerInfo timer,
             ILogger log)
         {
-            var syncService = new AzureSyncService();
+            var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
 
-            var playerFeedRows = await syncService.GetPlayerFeedRows();
+            var playerFeedRows = await tableService.GetPlayerFeedRows();
             log.LogInformation($"Queried player feeds table: {playerFeedRows.Count} rows returned.");
 
             var playerFeeds = await scraper.GetPlayerFeeds();
             log.LogInformation($"Scraped player feeds: {playerFeeds.Count} found.");
 
-            var syncResult = new SyncPlayerFeedsResult(playerFeedRows, playerFeeds);
+            var syncResult = new PlayerFeedsSyncResult(playerFeedRows, playerFeeds);
 
             if (syncResult.DefunctPlayerFeedRows.Any())
                 throw new SyncException("Defunct player feed rows found, manual intervention required: " +
@@ -37,7 +38,7 @@ namespace BBallGraphs.Syncer
 
             if (syncResult.FoundChanges)
             {
-                await syncService.UpdatePlayerFeedsTable(syncResult);
+                await tableService.UpdatePlayerFeedsTable(syncResult);
                 log.LogInformation("Player feeds table updated.");
             }
         }

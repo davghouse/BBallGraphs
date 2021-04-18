@@ -1,11 +1,11 @@
-﻿using BBallGraphs.BasketballReferenceScraper;
+﻿using BBallGraphs.AzureStorage.Rows;
+using BBallGraphs.BasketballReferenceScraper;
 using BBallGraphs.BasketballReferenceScraper.Helpers;
-using BBallGraphs.Syncer.Rows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 
-namespace BBallGraphs.Syncer.Tests.Rows
+namespace BBallGraphs.AzureStorage.Tests.Rows
 {
     [TestClass]
     public class PlayerRowTests

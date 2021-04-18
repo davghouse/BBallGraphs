@@ -1,5 +1,6 @@
+using BBallGraphs.AzureStorage;
+using BBallGraphs.AzureStorage.SyncResults;
 using BBallGraphs.BasketballReferenceScraper;
-using BBallGraphs.Syncer.SyncResults;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,23 +17,23 @@ namespace BBallGraphs.Syncer
             [TimerTrigger("0 */4 18-19 * * *")]TimerInfo timer,
             ILogger log)
         {
-            var syncService = new AzureSyncService();
+            var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
 
-            var playerFeedRow = (await syncService.GetNextPlayerFeedRows(
+            var playerFeedRow = (await tableService.GetNextPlayerFeedRows(
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
             log.LogInformation("Queried player feeds table for next feed: " +
                 $"{playerFeedRow?.ToString() ?? "N/A"}.");
             if (playerFeedRow == null) return;
 
-            var playerRows = await syncService.GetPlayerRows(playerFeedRow);
+            var playerRows = await tableService.GetPlayerRows(playerFeedRow);
             log.LogInformation($"Queried players table: {playerRows.Count} rows returned.");
 
             var players = await scraper.GetPlayers(playerFeedRow);
             log.LogInformation($"Scraped players: {players.Count} found.");
 
-            var syncResult = new SyncPlayersResult(playerRows, players);
+            var syncResult = new PlayersSyncResult(playerRows, players);
 
             if (syncResult.DefunctPlayerRows.Any())
                 throw new SyncException("Defunct player rows found, manual intervention required: " +
@@ -47,11 +48,11 @@ namespace BBallGraphs.Syncer
 
             if (syncResult.FoundChanges)
             {
-                await syncService.UpdatePlayersTable(syncResult);
+                await tableService.UpdatePlayersTable(syncResult);
                 log.LogInformation("Players table updated.");
             }
 
-            await syncService.RequeuePlayerFeedRow(playerFeedRow, syncResult.FoundChanges);
+            await tableService.RequeuePlayerFeedRow(playerFeedRow, syncResult.FoundChanges);
             log.LogInformation("Player feed row requeued.");
         }
     }
