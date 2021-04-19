@@ -52,7 +52,7 @@ namespace BBallGraphs.BasketballReferenceScraper
                 if (playerFeeds.Length < 25 || playerFeeds.Length > 26
                     || !playerFeeds.First().Url.EndsWith("/a/")
                     || !playerFeeds.Last().Url.EndsWith("/z/"))
-                    throw new ScrapeException($"Failed to scrape player feeds.", playerFeedsUrl, playerFeedsDocument.Source.Text);
+                    throw new ScrapeException($"Failed to scrape player feeds.", playerFeedsUrl);
 
                 return playerFeeds;
             }
@@ -75,7 +75,7 @@ namespace BBallGraphs.BasketballReferenceScraper
                         ?? (IHtmlAnchorElement)playerCell.FirstChild.FirstChild;
                     string profileUrl = playerCellAnchor.Href.Trim();
                     if (!_profileUrlIDRegex.IsMatch(profileUrl))
-                        throw new ScrapeException("Failed to parse player ID.", playerFeed.Url, playerFeedDocument.Source.Text);
+                        throw new ScrapeException("Failed to parse player ID.", playerFeed.Url);
 
                     var player = new Player
                     {
@@ -99,7 +99,7 @@ namespace BBallGraphs.BasketballReferenceScraper
                     || players.Any(p => p.FirstSeason < 1947 || p.LastSeason > DateTime.UtcNow.Year + 1
                         || p.HeightInInches < 12 || p.HeightInInches > 120
                         || p.BirthDate < new DateTime(1900, 1, 1)))
-                    throw new ScrapeException("Failed to scrape players.", playerFeed.Url, playerFeedDocument.Source.Text);
+                    throw new ScrapeException("Failed to scrape players.", playerFeed.Url);
 
                 return players;
             }
@@ -210,7 +210,7 @@ namespace BBallGraphs.BasketballReferenceScraper
                     // identify if we're missing games. Hard to do something better because of all the players that
                     // missed entire seasons and the playoffs--their game logs don't even have pgl_basic tables.
                     || player.ID == "russebi01" && (!games.Any(g => !g.IsPlayoffGame) || !games.Any(g => g.IsPlayoffGame)))
-                    throw new ScrapeException("Failed to scrape games.", gameLogUrl, gameLogDocument.Source.Text);
+                    throw new ScrapeException("Failed to scrape games.", gameLogUrl);
 
                 return games;
             }
