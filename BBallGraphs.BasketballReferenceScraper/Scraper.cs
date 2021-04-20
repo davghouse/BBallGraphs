@@ -174,7 +174,9 @@ namespace BBallGraphs.BasketballReferenceScraper
                         // This box score is the second game of the only doubleheader in NBA history.
                     if (game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195403082MLH.html"
                         // This guy was playing concurrently on two different teams, and played a game for each on the same day.
-                        || player.ID == "fitzgbo01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194702210TRH.html")
+                        || player.ID == "fitzgbo01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194702210TRH.html"
+                        // This guy randomly played one game on a different team, not really sure what's going on here.
+                        || player.ID == "johnsne01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195111220NYK.html")
                     {
                         game.ID = $"{game.ID} 2";
                         game.Date = game.Date.AddHours(3);

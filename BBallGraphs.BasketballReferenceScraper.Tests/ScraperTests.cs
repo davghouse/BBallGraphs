@@ -479,7 +479,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
         }
 
         [TestMethod]
-        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay()
+        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay_1()
         {
             var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
@@ -501,6 +501,31 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
             Assert.AreEqual(33, regularSeasonGames.Where(g => g.Team == "TRH").Count());
             Assert.AreEqual(29, regularSeasonGames.Where(g => g.Team == "NYK").Count());
             Assert.AreEqual(5, playoffGames.Where(g => g.Team == "NYK").Count());
+        }
+
+        [TestMethod]
+        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay_2()
+        {
+            var scraper = new Scraper(_transparentUserAgent);
+            var player = new Player
+            {
+                ID = "johnsne01",
+                FeedUrl = "https://www.basketball-reference.com/players/j/",
+                Name = "Neil Johnston",
+                FirstSeason = 1952,
+                LastSeason = 1959,
+                BirthDate = new DateTime(1929, 2, 4).AsUtc()
+            };
+
+            var games = await scraper.GetGames(player, 1952);
+            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
+            var playoffGames = games.Where(g => g.IsPlayoffGame);
+
+            Assert.AreEqual(65, regularSeasonGames.Count());
+            Assert.AreEqual(3, playoffGames.Count());
+            Assert.AreEqual(64, regularSeasonGames.Where(g => g.Team == "PHW").Count());
+            Assert.AreEqual(1, regularSeasonGames.Where(g => g.Team == "SYR").Count());
+            Assert.AreEqual(3, playoffGames.Where(g => g.Team == "PHW").Count());
         }
 
         [TestMethod]
