@@ -196,21 +196,26 @@ namespace BBallGraphs.BasketballReferenceScraper
                     }
                 }
 
-                if (games.Count > 110 /* 82 + 7*4, more are technically possible if traded, but let's ignore that. */
-                    || games.Count(g => g.IsHomeGame) > 70
-                    || games.Count(g => g.IsPlayoffGame) > 28
-                    || games.Count != games.Select(g => g.Date).Distinct().Count()
-                    || games.Any(g => g.Date < new DateTime(1946, 1, 1)
-                        || g.Date < player.BirthDate
-                        || g.Date < new DateTime(player.FirstSeason - 1, 1, 1)
-                        || g.Date > new DateTime(player.LastSeason, 12, 31)
-                        || g.Points > 110 || g.Assists > 40 || g.TotalRebounds > 45
-                        || g.Points < 0 || g.Assists < 0 || g.TotalRebounds < 0)
+                string errors = (games.Count > 110 ? "Found more than 110 games. " : null)
+                    + (games.Count(g => g.IsHomeGame) > 70 ? "Found more than 70 home games. " : null)
+                    + (games.Count(g => g.IsPlayoffGame) > 28 ? "Found more than 28 playoff games. " : null)
+                    + (games.Count != games.Select(g => g.Date).Distinct().Count() ? "Found multiple games on the same date. " : null)
+                    + (games.Any(g => g.Date < new DateTime(1946, 1, 1)) ? "Found a game before 1946. " : null)
+                    + (games.Any(g => g.Date > DateTime.UtcNow.AddDays(1)) ? "Found a game from the future. " : null)
+                    + (games.Any(g => g.Date < player.BirthDate) ? "Found a game before the player's birth date. " : null)
+                    + (games.Any(g => g.Date < new DateTime(player.FirstSeason - 1, 1, 1)) ? "Found a game before the player's first season. " : null)
+                    + (games.Any(g => g.Date > new DateTime(player.LastSeason, 12, 31)) ? "Found a game after the player's last season. " : null)
+                    + (games.Any(g => g.Points > 100) ? "Found a game where the player had more than 100 points. " : null)
+                    + (games.Any(g => g.TotalRebounds > 55) ? "Found a game where the player had more than 55 rebounds. " : null)
+                    + (games.Any(g => g.Assists > 30) ? "Found a game where the player had more than 30 assists. " : null)
+                    + (games.Any(g => g.Points < 0 || g.TotalRebounds < 0 || g.Assists < 0) ? "Found a game where the player had negative points, rebounds, or assists. " : null)
                     // Bill Russell never missed an entire regular season, or the playoffs. Use him as a canary to
                     // identify if we're missing games. Hard to do something better because of all the players that
                     // missed entire seasons and the playoffs--their game logs don't even have pgl_basic tables.
-                    || player.ID == "russebi01" && (!games.Any(g => !g.IsPlayoffGame) || !games.Any(g => g.IsPlayoffGame)))
-                    throw new ScrapeException("Failed to scrape games.", gameLogUrl);
+                    + (player.ID == "russebi01" && (!games.Any(g => !g.IsPlayoffGame) || !games.Any(g => g.IsPlayoffGame)) ? "Missing games for Bill Russell. " : null);
+
+                if (!string.IsNullOrEmpty(errors))
+                    throw new ScrapeException($"Failed to scrape games: {errors}", gameLogUrl);
 
                 return games;
             }
