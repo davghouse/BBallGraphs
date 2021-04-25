@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.AzureStorage.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.BlobBuilder", "BBallGraphs.BlobBuilder\BBallGraphs.BlobBuilder.csproj", "{BEDF1DC6-8B05-4BD2-ABE0-0CCC624855BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBallGraphs.AzureStorage", "BBallGraphs.AzureStorage\BBallGraphs.AzureStorage.csproj", "{66D4B595-048D-4C10-B4FD-9A853786B7DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBallGraphs.AzureStorage", "BBallGraphs.AzureStorage\BBallGraphs.AzureStorage.csproj", "{66D4B595-048D-4C10-B4FD-9A853786B7DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

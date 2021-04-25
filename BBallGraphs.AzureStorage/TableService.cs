@@ -18,12 +18,12 @@ namespace BBallGraphs.AzureStorage
         private readonly CloudTable _playersTable;
         private readonly CloudTable _gamesTable;
 
-        public TableService(string azureStorageConnectionString,
+        public TableService(string connectionString,
             string playerFeedsTableName = "BBallGraphsPlayerFeeds",
             string playersTableName = "BBallGraphsPlayers",
             string gamesTableName = "BBallGraphsGames")
         {
-            var account = CloudStorageAccount.Parse(azureStorageConnectionString);
+            var account = CloudStorageAccount.Parse(connectionString);
             var tableClient = account.CreateCloudTableClient();
 
             _playerFeedsTable = tableClient.GetTableReference(playerFeedsTableName);
@@ -44,6 +44,15 @@ namespace BBallGraphs.AzureStorage
                 TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "0"));
 
             return (await _playerFeedsTable.ExecuteQueryAsync(query))
+                .ToArray();
+        }
+
+        public async Task<IReadOnlyList<PlayerRow>> GetPlayerRows()
+        {
+            var query = new TableQuery<PlayerRow>().Where(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "0"));
+
+            return (await _playersTable.ExecuteQueryAsync(query))
                 .ToArray();
         }
 

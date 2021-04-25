@@ -22,6 +22,8 @@ namespace BBallGraphs.AzureStorage.Rows
         public DateTime? LastSyncTimeUtc { get; set; }
         public DateTime? LastSyncWithChangesTimeUtc { get; set; }
 
+        public bool HasSyncedGames => LastSyncWithChangesTimeUtc.HasValue;
+
         public int GetNextSyncSeason()
             => !LastSyncSeason.HasValue ? FirstSeason
             : LastSyncSeason < LastSeason ? LastSyncSeason.Value + 1
