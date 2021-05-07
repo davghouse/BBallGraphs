@@ -43,9 +43,10 @@ namespace BBallGraphs.Syncer
 
             // For now we want to keep an eye on how game rows get updated. We want to verify the updates are legitimate and not the
             // result of a scraping problem. Once we understand how they get updated, this can be removed or made more lenient.
-            if (syncResult.UpdatedGameRows.Any())
+            // 202104130UTA: Some player(s) had their played time adjusted by a second.
+            if (syncResult.UpdatedGameRows.Any(r => !r.BoxScoreUrl.Contains("202104130UTA")))
                 throw new SyncException($"Updated game rows found, manual intervention required: " +
-                    $"{string.Join(", ", syncResult.UpdatedGameRows.Select(g => g.ID))}", playerRow.GetGameLogUrl(syncSeason));
+                    $"{string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
             log.LogInformation(syncResult.NewGames.Any()
                 ? $"New games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.NewGames.Select(g => g.ID))}"
