@@ -263,7 +263,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new PlayersSyncResult(playerRowsFeed1, updatedPlayersFeed1);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(5, syncResult.UpdatedPlayerRows.Count);
-            Assert.AreEqual(5, syncResult.NewPlayers.Count);
+            Assert.AreEqual(5, syncResult.NewPlayerRows.Count);
 
             await _tableService.UpdatePlayersTable(syncResult);
             playerRowsFeed1 = await _tableService.GetPlayerRows(playerFeeds[0]);
@@ -273,7 +273,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new PlayersSyncResult(playerRowsFeed1, updatedPlayersFeed1);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayers.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerRows.Count);
 
             var playerRowsFeed5 = await _tableService.GetPlayerRows(playerFeeds[4]);
             Assert.AreEqual(5, playerRowsFeed5.Count);
@@ -297,7 +297,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new PlayersSyncResult(playerRowsFeed5, updatedPlayersFeed5);
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(1, syncResult.UpdatedPlayerRows.Count);
-            Assert.AreEqual(1, syncResult.NewPlayers.Count);
+            Assert.AreEqual(1, syncResult.NewPlayerRows.Count);
 
             await _tableService.UpdatePlayersTable(syncResult);
             playerRowsFeed1 = await _tableService.GetPlayerRows(playerFeeds[0]);
@@ -356,7 +356,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new GamesSyncResult(gameRowsPlayer1Season2000, updatedGamesPlayer1);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(110, syncResult.UpdatedGameRows.Count);
-            Assert.AreEqual(80, syncResult.NewGames.Count);
+            Assert.AreEqual(80, syncResult.NewGameRows.Count);
 
             await _tableService.UpdateGamesTable(syncResult);
             gameRowsPlayer1Season2000 = await _tableService.GetGameRows(players[0], 2000);
@@ -369,7 +369,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new GamesSyncResult(gameRowsPlayer1Season2000.Concat(gameRowsPlayer1Season2001), updatedGamesPlayer1);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
 
             var gameRowsPlayer4Season2000 = await _tableService.GetGameRows(players[3], 2000);
             Assert.AreEqual(0, gameRowsPlayer4Season2000.Count);
@@ -402,7 +402,7 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new GamesSyncResult(gameRowsPlayer5Season2004, updatedGamesPlayer5);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(55, syncResult.UpdatedGameRows.Count);
-            Assert.AreEqual(80, syncResult.NewGames.Count);
+            Assert.AreEqual(80, syncResult.NewGameRows.Count);
 
             await _tableService.UpdateGamesTable(syncResult);
             gameRowsPlayer1Season2000 = await _tableService.GetGameRows(players[0], 2000);
@@ -422,7 +422,48 @@ namespace BBallGraphs.AzureStorage.Tests
             syncResult = new GamesSyncResult(gameRowsPlayer5Season2004.Concat(gameRowsPlayer5Season2005), updatedGamesPlayer5);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
+        }
+
+        [TestMethod]
+        public async Task UpdateGamesTable_WhenDefunctGamesExist()
+        {
+            var player = new Player { ID = "1", BirthDate = DateTime.UtcNow };
+            var games = Enumerable.Range(1, 200)
+                    .Select(i => new Game
+                    {
+                        ID = $"1-{i}",
+                        PlayerID = "1",
+                        Season = 2000,
+                        Date = new DateTime(2000, 1, 1).AddDays(i).AsUtc(),
+                        Points = i,
+                        TotalRebounds = 5
+                    }).ToArray();
+            var syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games.Where(g => g.Points <= 120));
+            Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
+            Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
+            Assert.AreEqual(120, syncResult.NewGameRows.Count);
+
+            await _tableService.UpdateGamesTable(syncResult);
+            var gameRows = await _tableService.GetGameRows(player, 2000);
+            Assert.AreEqual(120, gameRows.Count);
+            Assert.AreEqual(20, gameRows.Count(r => r.Points > 100));
+
+            games[50].TotalRebounds = 6;
+            games[60].TotalRebounds = 7;
+
+            syncResult = new GamesSyncResult(gameRows, games.Where(g => g.Points <= 100 || g.Points >= 151));
+            Assert.AreEqual(20, syncResult.DefunctGameRows.Count);
+            Assert.AreEqual(2, syncResult.UpdatedGameRows.Count);
+            Assert.AreEqual(50, syncResult.NewGameRows.Count);
+
+            await _tableService.UpdateGamesTable(syncResult);
+            gameRows = await _tableService.GetGameRows(player, 2000);
+            Assert.AreEqual(150, gameRows.Count);
+            Assert.AreEqual(1, gameRows.Count(r => r.TotalRebounds == 6));
+            Assert.AreEqual(1, gameRows.Count(r => r.TotalRebounds == 7));
+            Assert.AreEqual(148, gameRows.Count(r => r.TotalRebounds == 5));
+            Assert.AreEqual(50, gameRows.Count(r => r.Points > 100));
         }
 
         [TestMethod]

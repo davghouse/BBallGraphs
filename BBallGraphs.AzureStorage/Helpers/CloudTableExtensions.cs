@@ -6,6 +6,8 @@ namespace BBallGraphs.AzureStorage.Helpers
 {
     public static class CloudTableExtensions
     {
+        private const int _batchOperationLimit = 100; // Azure's limit
+
         // http://stackoverflow.com/q/24234350, https://github.com/Azure/azure-storage-net/issues/94
         public static async Task<IList<T>> ExecuteQueryAsync<T>(this CloudTable table, TableQuery<T> query)
             where T : ITableEntity, new()
@@ -27,6 +29,25 @@ namespace BBallGraphs.AzureStorage.Helpers
             }
 
             return results;
+        }
+
+        public static Task ExecuteBatchesAsync(this CloudTable table, IEnumerable<TableOperation> operations)
+        {
+            var batchTasks = new List<Task>();
+            var batchOperation = new TableBatchOperation();
+            foreach (var operation in operations)
+            {
+                if (batchOperation.Count == _batchOperationLimit)
+                {
+                    batchTasks.Add(table.ExecuteBatchAsync(batchOperation));
+                    batchOperation = new TableBatchOperation();
+                }
+
+                batchOperation.Add(operation);
+            }
+            batchTasks.Add(table.ExecuteBatchAsync(batchOperation));
+
+            return Task.WhenAll(batchTasks);
         }
     }
 }

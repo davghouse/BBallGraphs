@@ -11,21 +11,21 @@ namespace BBallGraphs.AzureStorage.SyncResults
             IEnumerable<PlayerFeedRow> playerFeedRows,
             IEnumerable<PlayerFeed> playerFeeds)
         {
-            var playerFeedRowsDict = playerFeedRows.ToDictionary(r => r.Url);
-            var playerFeedsDict = playerFeeds.ToDictionary(f => f.Url);
+            var playerFeedRowsByID = playerFeedRows.ToDictionary(r => r.Url);
+            var playerFeedsByID = playerFeeds.ToDictionary(f => f.Url);
 
-            DefunctPlayerFeedRows = playerFeedRowsDict.Values
-                .Where(r => !playerFeedsDict.ContainsKey(r.Url))
+            DefunctPlayerFeedRows = playerFeedRowsByID.Values
+                .Where(r => !playerFeedsByID.ContainsKey(r.Url))
                 .ToArray();
-            NewPlayerFeeds = playerFeedsDict.Values
-                .Where(f => !playerFeedRowsDict.ContainsKey(f.Url))
+            NewPlayerFeedRows = PlayerFeedRow.CreateRows(playerFeedsByID.Values
+                .Where(f => !playerFeedRowsByID.ContainsKey(f.Url)))
                 .ToArray();
         }
 
         public IReadOnlyList<PlayerFeedRow> DefunctPlayerFeedRows { get; }
-        public IReadOnlyList<PlayerFeed> NewPlayerFeeds { get; }
+        public IReadOnlyList<PlayerFeedRow> NewPlayerFeedRows { get; }
 
         public bool FoundChanges
-            => DefunctPlayerFeedRows.Any() || NewPlayerFeeds.Any();
+            => DefunctPlayerFeedRows.Any() || NewPlayerFeedRows.Any();
     }
 }

@@ -32,8 +32,8 @@ namespace BBallGraphs.Syncer
                 throw new SyncException("Defunct player feed rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctPlayerFeedRows.Select(r => r.Url))}");
 
-            log.LogInformation(syncResult.NewPlayerFeeds.Any()
-                ? $"New player feeds found: {string.Join(", ", syncResult.NewPlayerFeeds.Select(f => f.Url))}"
+            log.LogInformation(syncResult.NewPlayerFeedRows.Any()
+                ? $"New player feeds found: {string.Join(", ", syncResult.NewPlayerFeedRows.Select(r => r.Url))}"
                 : "No new player feeds found.");
 
             if (syncResult.FoundChanges)

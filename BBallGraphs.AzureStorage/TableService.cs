@@ -13,7 +13,6 @@ namespace BBallGraphs.AzureStorage
 {
     public class TableService
     {
-        private const int _batchOperationLimit = 100; // Azure's limit
         private readonly CloudTable _playerFeedsTable;
         private readonly CloudTable _playersTable;
         private readonly CloudTable _gamesTable;
@@ -116,76 +115,25 @@ namespace BBallGraphs.AzureStorage
         }
 
         public async Task UpdatePlayerFeedsTable(PlayerFeedsSyncResult syncResult)
-        {
-            if (syncResult.DefunctPlayerFeedRows.Any())
-                throw new SyncException("Defunct player feed rows, manual intervention required.");
-
-            var batchTasks = new List<Task>();
-            var batchOperation = new TableBatchOperation();
-            foreach (var playerFeedRow in PlayerFeedRow.CreateRows(syncResult.NewPlayerFeeds))
-            {
-                if (batchOperation.Count == _batchOperationLimit)
-                {
-                    batchTasks.Add(_playerFeedsTable.ExecuteBatchAsync(batchOperation));
-                    batchOperation = new TableBatchOperation();
-                }
-
-                batchOperation.Insert(playerFeedRow);
-            }
-            batchTasks.Add(_playerFeedsTable.ExecuteBatchAsync(batchOperation));
-
-            await Task.WhenAll(batchTasks);
-        }
+            => await _playerFeedsTable.ExecuteBatchesAsync(syncResult.DefunctPlayerFeedRows.Select(TableOperation.Delete)
+                .Concat(syncResult.NewPlayerFeedRows.Select(TableOperation.Insert)));
 
         public async Task UpdatePlayersTable(PlayersSyncResult syncResult)
-        {
-            if (syncResult.DefunctPlayerRows.Any())
-                throw new SyncException("Defunct player rows, manual intervention required.");
-
-            var batchTasks = new List<Task>();
-            var batchOperation = new TableBatchOperation();
-            foreach (var playerRow in PlayerRow.CreateRows(syncResult.NewPlayers)
-                .Concat(syncResult.UpdatedPlayerRows))
-            {
-                if (batchOperation.Count == _batchOperationLimit)
-                {
-                    batchTasks.Add(_playersTable.ExecuteBatchAsync(batchOperation));
-                    batchOperation = new TableBatchOperation();
-                }
-
-                batchOperation.InsertOrReplace(playerRow);
-            }
-            batchTasks.Add(_playersTable.ExecuteBatchAsync(batchOperation));
-
-            await Task.WhenAll(batchTasks);
-        }
+            => await _playersTable.ExecuteBatchesAsync(syncResult.DefunctPlayerRows.Select(TableOperation.Delete)
+                .Concat(syncResult.NewPlayerRows.Select(TableOperation.Insert))
+                .Concat(syncResult.UpdatedPlayerRows.Select(TableOperation.Replace)));
 
         public async Task UpdateGamesTable(GamesSyncResult syncResult)
         {
-            if (syncResult.DefunctGameRows.Any())
-                throw new SyncException("Defunct game rows, manual intervention required.");
-
-            if (syncResult.NewGames.Select(g => g.PlayerID)
-                .Concat(syncResult.UpdatedGameRows.Select(r => r.PlayerID))
-                .Distinct().Count() > 1)
+            if (syncResult.DefunctGameRows
+                .Concat(syncResult.NewGameRows)
+                .Concat(syncResult.UpdatedGameRows)
+                .Select(r => r.PlayerID).Distinct().Count() > 1)
                 throw new SyncException("Can only update games for one player at a time.");
 
-            var batchTasks = new List<Task>();
-            var batchOperation = new TableBatchOperation();
-            foreach (var gameRow in GameRow.CreateRows(syncResult.NewGames)
-                .Concat(syncResult.UpdatedGameRows))
-            {
-                if (batchOperation.Count == _batchOperationLimit)
-                {
-                    batchTasks.Add(_gamesTable.ExecuteBatchAsync(batchOperation));
-                    batchOperation = new TableBatchOperation();
-                }
-
-                batchOperation.InsertOrReplace(gameRow);
-            }
-            batchTasks.Add(_gamesTable.ExecuteBatchAsync(batchOperation));
-
-            await Task.WhenAll(batchTasks);
+            await _gamesTable.ExecuteBatchesAsync(syncResult.DefunctGameRows.Select(TableOperation.Delete)
+                .Concat(syncResult.NewGameRows.Select(TableOperation.Insert))
+                .Concat(syncResult.UpdatedGameRows.Select(TableOperation.Replace)));
         }
 
         public async Task RequeuePlayerFeedRow(PlayerFeedRow playerFeedRow, bool syncFoundChanges)

@@ -23,9 +23,8 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             CollectionAssert.AreEquivalent(
                 playerRows.Where(r => r.ID == "2" || r.ID == "4").ToArray(),
                 syncResult.DefunctPlayerRows.ToArray());
-            CollectionAssert.AreEquivalent(
-                players.Where(p => p.ID == "0" || p.ID == "6").ToArray(),
-                syncResult.NewPlayers.ToArray());
+            Assert.IsTrue(players.Where(p => p.ID == "0" || p.ID == "6")
+                .Zip(syncResult.NewPlayerRows).All(p => p.First.Matches(p.Second)));
             CollectionAssert.AreEquivalent(
                 playerRows.Where(r => r.ID == "3" || r.ID == "5").ToArray(),
                 syncResult.UpdatedPlayerRows.ToArray());
@@ -48,7 +47,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new PlayersSyncResult(playerRows, players);
 
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayers.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }
@@ -62,7 +61,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new PlayersSyncResult(playerRows, Enumerable.Empty<Player>());
 
             CollectionAssert.AreEqual(playerRows, syncResult.DefunctPlayerRows.ToArray());
-            Assert.AreEqual(0, syncResult.NewPlayers.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
         }
@@ -75,7 +74,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 .ToArray();
             var syncResult = new PlayersSyncResult(Enumerable.Empty<PlayerRow>(), players);
 
-            CollectionAssert.AreEqual(players, syncResult.NewPlayers.ToArray());
+            Assert.IsTrue(players.Zip(syncResult.NewPlayerRows).All(p => p.First.Matches(p.Second)));
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
@@ -93,7 +92,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new PlayersSyncResult(playerRows, players);
 
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayers.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerRows.Count);
             CollectionAssert.AreEquivalent(playerRows, syncResult.UpdatedPlayerRows.ToArray());
             CollectionAssert.AreEqual(
                 new[] { "1", "2", "3", "4", "5" }, playerRows.Select(r => r.ID).ToArray());
@@ -110,7 +109,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 Enumerable.Empty<PlayerRow>(), Enumerable.Empty<Player>());
 
             Assert.AreEqual(0, syncResult.DefunctPlayerRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayers.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedPlayerRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }

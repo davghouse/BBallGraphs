@@ -23,9 +23,8 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             CollectionAssert.AreEquivalent(
                 playerFeedRows.Where(r => r.Url == "4" || r.Url == "5" || r.Url == "9").ToArray(),
                 syncResult.DefunctPlayerFeedRows.ToArray());
-            CollectionAssert.AreEquivalent(
-                playerFeeds.Where(f => f.Url == "0" || f.Url == "10" || f.Url == "11").ToArray(),
-                syncResult.NewPlayerFeeds.ToArray());
+            Assert.IsTrue(playerFeeds.Where(f => f.Url == "0" || f.Url == "10" || f.Url == "11")
+                .Zip(syncResult.NewPlayerFeedRows).All(p => p.First.Matches(p.Second)));
             Assert.IsTrue(syncResult.FoundChanges);
         }
 
@@ -41,7 +40,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new PlayerFeedsSyncResult(playerFeedRows, playerFeeds);
 
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayerFeeds.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerFeedRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }
 
@@ -54,7 +53,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new PlayerFeedsSyncResult(playerFeedRows, Enumerable.Empty<PlayerFeed>());
 
             CollectionAssert.AreEqual(playerFeedRows, syncResult.DefunctPlayerFeedRows.ToArray());
-            Assert.AreEqual(0, syncResult.NewPlayerFeeds.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerFeedRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
         }
 
@@ -66,7 +65,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 .ToArray();
             var syncResult = new PlayerFeedsSyncResult(Enumerable.Empty<PlayerFeedRow>(), playerFeeds);
 
-            CollectionAssert.AreEqual(playerFeeds, syncResult.NewPlayerFeeds.ToArray());
+            Assert.IsTrue(playerFeeds.Zip(syncResult.NewPlayerFeedRows).All(p => p.First.Matches(p.Second)));
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
         }
@@ -78,7 +77,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 Enumerable.Empty<PlayerFeedRow>(), Enumerable.Empty<PlayerFeed>());
 
             Assert.AreEqual(0, syncResult.DefunctPlayerFeedRows.Count);
-            Assert.AreEqual(0, syncResult.NewPlayerFeeds.Count);
+            Assert.AreEqual(0, syncResult.NewPlayerFeedRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }
     }

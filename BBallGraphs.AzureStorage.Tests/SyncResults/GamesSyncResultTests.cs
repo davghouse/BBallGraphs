@@ -23,9 +23,8 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             CollectionAssert.AreEquivalent(
                 gameRows.Where(r => r.ID == "2" || r.ID == "4").ToArray(),
                 syncResult.DefunctGameRows.ToArray());
-            CollectionAssert.AreEquivalent(
-                games.Where(g => g.ID == "0" || g.ID == "6").ToArray(),
-                syncResult.NewGames.ToArray());
+            Assert.IsTrue(games.Where(g => g.ID == "0" || g.ID == "6")
+                .Zip(syncResult.NewGameRows).All(p => p.First.Matches(p.Second)));
             CollectionAssert.AreEquivalent(
                 gameRows.Where(r => r.ID == "3" || r.ID == "5").ToArray(),
                 syncResult.UpdatedGameRows.ToArray());
@@ -48,7 +47,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new GamesSyncResult(gameRows, games);
 
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }
@@ -62,7 +61,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new GamesSyncResult(gameRows, Enumerable.Empty<Game>());
 
             CollectionAssert.AreEqual(gameRows, syncResult.DefunctGameRows.ToArray());
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
         }
@@ -75,7 +74,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 .ToArray();
             var syncResult = new GamesSyncResult(Enumerable.Empty<GameRow>(), games);
 
-            CollectionAssert.AreEqual(games, syncResult.NewGames.ToArray());
+            Assert.IsTrue(games.Zip(syncResult.NewGameRows).All(p => p.First.Matches(p.Second)));
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.IsTrue(syncResult.FoundChanges);
@@ -93,7 +92,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
             var syncResult = new GamesSyncResult(gameRows, games);
 
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
             CollectionAssert.AreEquivalent(gameRows, syncResult.UpdatedGameRows.ToArray());
             CollectionAssert.AreEqual(
                 new[] { "1", "2", "3", "4", "5" }, gameRows.Select(r => r.ID).ToArray());
@@ -110,7 +109,7 @@ namespace BBallGraphs.AzureStorage.Tests.SyncResults
                 Enumerable.Empty<GameRow>(), Enumerable.Empty<Game>());
 
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
-            Assert.AreEqual(0, syncResult.NewGames.Count);
+            Assert.AreEqual(0, syncResult.NewGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);
             Assert.IsFalse(syncResult.FoundChanges);
         }

@@ -35,12 +35,16 @@ namespace BBallGraphs.Syncer
 
             var syncResult = new PlayersSyncResult(playerRows, players);
 
-            if (syncResult.DefunctPlayerRows.Any())
+            if (syncResult.DefunctPlayerRows.Any()
+                && !bool.Parse(Environment.GetEnvironmentVariable("AllowDefunctPlayerRows")))
                 throw new SyncException("Defunct player rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctPlayerRows.Select(r => r.ID))}", playerFeedRow.Url);
 
-            log.LogInformation(syncResult.NewPlayers.Any()
-                ? $"New players found: {string.Join(", ", syncResult.NewPlayers.Select(p => p.ID))}"
+            log.LogInformation(syncResult.DefunctPlayerRows.Any()
+                ? $"Defunct players found: {string.Join(", ", syncResult.DefunctPlayerRows.Select(r => r.ID))}"
+                : "No defunct players found.");
+            log.LogInformation(syncResult.NewPlayerRows.Any()
+                ? $"New players found: {string.Join(", ", syncResult.NewPlayerRows.Select(r => r.ID))}"
                 : "No new players found.");
             log.LogInformation(syncResult.UpdatedPlayerRows.Any()
                 ? $"Updated players found: {string.Join(", ", syncResult.UpdatedPlayerRows.Select(r => r.ID))}"

@@ -37,19 +37,23 @@ namespace BBallGraphs.Syncer
 
             var syncResult = new GamesSyncResult(gameRows, games);
 
-            if (syncResult.DefunctGameRows.Any())
+            if (syncResult.DefunctGameRows.Any()
+                && !bool.Parse(Environment.GetEnvironmentVariable("AllowDefunctGameRows")))
                 throw new SyncException("Defunct game rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctGameRows.Select(g => g.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
             // For now we want to keep an eye on how game rows get updated. We want to verify the updates are legitimate and not the
             // result of a scraping problem. Once we understand how they get updated, this can be removed or made more lenient.
-            // 202104130UTA: Some player(s) had their played time adjusted by a second.
-            if (syncResult.UpdatedGameRows.Any(r => !r.BoxScoreUrl.Contains("202104130UTA")))
+            if (syncResult.UpdatedGameRows.Any()
+                && !bool.Parse(Environment.GetEnvironmentVariable("AllowUpdatedGameRows")))
                 throw new SyncException($"Updated game rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
-            log.LogInformation(syncResult.NewGames.Any()
-                ? $"New games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.NewGames.Select(g => g.ID))}"
+            log.LogInformation(syncResult.DefunctGameRows.Any()
+                ? $"Defunct games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.DefunctGameRows.Select(r => r.ID))}"
+                : $"No defunct games found for {playerRow.Name}'s {syncSeason} season.");
+            log.LogInformation(syncResult.NewGameRows.Any()
+                ? $"New games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.NewGameRows.Select(r => r.ID))}"
                 : $"No new games found for {playerRow.Name}'s {syncSeason} season.");
             log.LogInformation(syncResult.UpdatedGameRows.Any()
                 ? $"Updated games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}"

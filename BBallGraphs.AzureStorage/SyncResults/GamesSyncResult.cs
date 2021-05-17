@@ -11,20 +11,20 @@ namespace BBallGraphs.AzureStorage.SyncResults
             IEnumerable<GameRow> gameRows,
             IEnumerable<Game> games)
         {
-            var gameRowsDict = gameRows.ToDictionary(r => r.ID);
-            var gamesDict = games.ToDictionary(g => g.ID);
+            var gameRowsByID = gameRows.ToDictionary(r => r.ID);
+            var gamesByID = games.ToDictionary(g => g.ID);
 
-            DefunctGameRows = gameRowsDict.Values
-                .Where(r => !gamesDict.ContainsKey(r.ID))
+            DefunctGameRows = gameRowsByID.Values
+                .Where(r => !gamesByID.ContainsKey(r.ID))
                 .ToArray();
-            NewGames = gamesDict.Values
-                .Where(g => !gameRowsDict.ContainsKey(g.ID))
+            NewGameRows = GameRow.CreateRows(gamesByID.Values
+                .Where(g => !gameRowsByID.ContainsKey(g.ID)))
                 .ToArray();
 
             var updatedGameRows = new List<GameRow>();
-            foreach (var game in gamesDict.Values)
+            foreach (var game in gamesByID.Values)
             {
-                if (gameRowsDict.TryGetValue(game.ID, out GameRow gameRow)
+                if (gameRowsByID.TryGetValue(game.ID, out GameRow gameRow)
                     && !game.Matches(gameRow))
                 {
                     game.CopyTo(gameRow);
@@ -35,10 +35,10 @@ namespace BBallGraphs.AzureStorage.SyncResults
         }
 
         public IReadOnlyList<GameRow> DefunctGameRows { get; }
-        public IReadOnlyList<Game> NewGames { get; }
+        public IReadOnlyList<GameRow> NewGameRows { get; }
         public IReadOnlyList<GameRow> UpdatedGameRows { get; }
 
         public bool FoundChanges
-            => DefunctGameRows.Any() || NewGames.Any() || UpdatedGameRows.Any();
+            => DefunctGameRows.Any() || NewGameRows.Any() || UpdatedGameRows.Any();
     }
 }
