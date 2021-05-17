@@ -28,27 +28,27 @@ namespace BBallGraphs.AzureStorage
                 : null;
         }
 
-        public async Task UploadBlobContent(string blobName, string content)
+        public Task UploadBlobContent(string blobName, string content)
         {
             var blobReference = GetBlobReference(blobName);
 
-            await blobReference.UploadTextAsync(content);
+            return blobReference.UploadTextAsync(content);
         }
 
-        public async Task DeleteBlob(string blobName)
+        public Task DeleteBlob(string blobName)
         {
             var blobReference = GetBlobReference(blobName);
 
-            await blobReference.DeleteIfExistsAsync();
+            return blobReference.DeleteIfExistsAsync();
         }
 
         public CloudBlockBlob GetPlayersBlobReference()
             => GetBlobReference("players.json");
 
-        public async Task<string> DownloadPlayersBlobContent()
-            => await DownloadBlobContent("players.json");
+        public Task<string> DownloadPlayersBlobContent()
+            => DownloadBlobContent("players.json");
 
-        public async Task UploadPlayersBlobContent(string content)
-            => await UploadBlobContent("players.json", content);
+        public Task UploadPlayersBlobContent(string content)
+            => UploadBlobContent("players.json", content);
     }
 }
