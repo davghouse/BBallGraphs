@@ -48,7 +48,7 @@ namespace BBallGraphs.AzureStorage
         public Task<IList<PlayerRow>> GetPlayerRows()
         {
             var query = new TableQuery<PlayerRow>().Where(
-                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "0"));
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "0"));
 
             return _playersTable.ExecuteQueryAsync(query);
         }
@@ -63,6 +63,17 @@ namespace BBallGraphs.AzureStorage
 
             return _playersTable.ExecuteQueryAsync(query);
         }
+
+        public Task<IList<GameRow>> GetGameRows(string playerID)
+        {
+            var query = new TableQuery<GameRow>().Where(
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, playerID));
+
+            return _gamesTable.ExecuteQueryAsync(query);
+        }
+
+        public Task<IList<GameRow>> GetGameRows(IPlayer player)
+            => GetGameRows(player.ID);
 
         public Task<IList<GameRow>> GetGameRows(IPlayer player, int season)
         {

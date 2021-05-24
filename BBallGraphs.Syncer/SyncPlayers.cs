@@ -18,18 +18,16 @@ namespace BBallGraphs.Syncer
             ILogger log)
         {
             var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
-            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
-
             var playerFeedRow = (await tableService.GetNextPlayerFeedRows(
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
-            log.LogInformation("Queried player feeds table for next feed: " +
-                $"{playerFeedRow?.ToString() ?? "N/A"}.");
+            log.LogInformation($"Queried player feeds table for next feed: {playerFeedRow?.ToString() ?? "N/A"}.");
             if (playerFeedRow == null) return;
 
             var playerRows = await tableService.GetPlayerRows(playerFeedRow);
             log.LogInformation($"Queried players table: {playerRows.Count} rows returned.");
 
+            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
             var players = await scraper.GetPlayers(playerFeedRow);
             log.LogInformation($"Scraped players: {players.Count} found.");
 

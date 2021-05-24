@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using BBallGraphs.AzureStorage.BlobObjects;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -31,6 +33,47 @@ namespace BBallGraphs.AzureStorage.Tests
 
             await _blobService.DeleteBlob(blobName);
             content = await _blobService.DownloadBlobContent(blobName);
+            Assert.IsNull(content);
+        }
+
+        [TestMethod]
+        public async Task GamesBlobCRUD()
+        {
+            string playerID = $"testPlayer{DateTime.UtcNow.Ticks}";
+            string content = await _blobService.DownloadGamesBlobContent(playerID);
+            Assert.IsNull(content);
+
+            var games = new GameBlobObject[0];
+            await _blobService.UploadGamesBlobContent(playerID, JsonConvert.SerializeObject(games));
+            content = await _blobService.DownloadGamesBlobContent(playerID);
+            Assert.AreEqual("[]", content);
+
+            games = new GameBlobObject[]
+            {
+                new GameBlobObject
+                {
+                    PlayerID = playerID,
+                    PlayerName = "Test Player",
+                    Season = 2000,
+                    Date = new DateTime(2000, 1, 1),
+                    Points = 5
+                },
+                new GameBlobObject
+                {
+                    PlayerID = playerID,
+                    PlayerName = "Test Player",
+                    Season = 2000,
+                    Date = new DateTime(2000, 1, 2),
+                    Points = 10
+                }
+            };
+
+            await _blobService.UploadGamesBlobContent(playerID, JsonConvert.SerializeObject(games));
+            content = await _blobService.DownloadGamesBlobContent(playerID);
+            CollectionAssert.AreEqual(games, JsonConvert.DeserializeObject<GameBlobObject[]>(content));
+
+            await _blobService.DeleteBlob($"{playerID}.json");
+            content = await _blobService.DownloadGamesBlobContent(playerID);
             Assert.IsNull(content);
         }
     }

@@ -18,13 +18,10 @@ namespace BBallGraphs.Syncer
             ILogger log)
         {
             var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
-            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
-
             var playerRow = (await tableService.GetNextPlayerRows(
                 rowLimit: 1, minimumTimeSinceLastSync: TimeSpan.FromHours(12)))
                 .SingleOrDefault();
-            log.LogInformation("Queried players table for next player: " +
-                $"{playerRow?.ToString() ?? "N/A"}.");
+            log.LogInformation($"Queried players table for next player: {playerRow?.ToString() ?? "N/A"}.");
             if (playerRow == null) return;
 
             int syncSeason = playerRow.GetNextSyncSeason();
@@ -32,6 +29,7 @@ namespace BBallGraphs.Syncer
             var gameRows = await tableService.GetGameRows(playerRow, syncSeason);
             log.LogInformation($"Queried games table for {playerRow.Name}'s {syncSeason} season: {gameRows.Count} rows returned.");
 
+            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
             var games = await scraper.GetGames(playerRow, syncSeason);
             log.LogInformation($"Scraped games for {playerRow.Name}'s {syncSeason} season: {games.Count} found.");
 
@@ -61,6 +59,10 @@ namespace BBallGraphs.Syncer
 
             if (syncResult.FoundChanges)
             {
+                var queueService = new QueueService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+                await queueService.AddPlayerToBuildGamesBlobQueue(playerRow.ID);
+                log.LogInformation($"Added {playerRow.Name} ({playerRow.ID}) to BuildGamesBlob queue.");
+
                 await tableService.UpdateGamesTable(syncResult);
                 log.LogInformation("Games table updated.");
             }

@@ -18,11 +18,10 @@ namespace BBallGraphs.Syncer
             ILogger log)
         {
             var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
-            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
-
             var playerFeedRows = await tableService.GetPlayerFeedRows();
             log.LogInformation($"Queried player feeds table: {playerFeedRows.Count} rows returned.");
 
+            var scraper = new Scraper(Environment.GetEnvironmentVariable("TransparentUserAgent"));
             var playerFeeds = await scraper.GetPlayerFeeds();
             log.LogInformation($"Scraped player feeds: {playerFeeds.Count} found.");
 

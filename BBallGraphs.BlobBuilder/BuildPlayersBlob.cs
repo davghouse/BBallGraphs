@@ -18,13 +18,12 @@ namespace BBallGraphs.BlobBuilder
             [TimerTrigger("0 0 9 * * *")]TimerInfo timer,
             ILogger log)
         {
-            var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var blobService = new BlobService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
-
             string playersBlobContent = await blobService.DownloadPlayersBlobContent();
             var blobPlayers = JsonConvert.DeserializeObject<IReadOnlyList<PlayerBlobObject>>(playersBlobContent ?? "[]");
             log.LogInformation($"Downloaded players blob: {blobPlayers.Count} players found.");
 
+            var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var tablePlayers = (await tableService.GetPlayerRows())
                 .Where(r => r.HasSyncedGames)
                 .Select(r => new PlayerBlobObject(r))

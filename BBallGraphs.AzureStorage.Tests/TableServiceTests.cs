@@ -419,6 +419,11 @@ namespace BBallGraphs.AzureStorage.Tests
             Assert.IsTrue(gameRowsPlayer5Season2005.Zip(updatedGamesPlayer5.Where(g => g.Season == 2005), (r, g) => r.Matches(g)).All(m => m));
             Assert.AreEqual(syncResult.UpdatedGameRows.OrderBy(r => r.ID).First().RowKey, gameRowsPlayer5Season2004.OrderBy(r => r.ID).First().RowKey);
 
+            var gameRowsPlayer1 = await _tableService.GetGameRows(players[0]);
+            var gameRowsPlayer5 = await _tableService.GetGameRows(players[4]);
+            Assert.AreEqual(190, gameRowsPlayer1.Count);
+            Assert.AreEqual(190, gameRowsPlayer5.Count);
+
             syncResult = new GamesSyncResult(gameRowsPlayer5Season2004.Concat(gameRowsPlayer5Season2005), updatedGamesPlayer5);
             Assert.AreEqual(0, syncResult.DefunctGameRows.Count);
             Assert.AreEqual(0, syncResult.UpdatedGameRows.Count);

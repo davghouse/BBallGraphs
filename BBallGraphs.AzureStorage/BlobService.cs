@@ -42,13 +42,16 @@ namespace BBallGraphs.AzureStorage
             return blobReference.DeleteIfExistsAsync();
         }
 
-        public CloudBlockBlob GetPlayersBlobReference()
-            => GetBlobReference("players.json");
-
         public Task<string> DownloadPlayersBlobContent()
             => DownloadBlobContent("players.json");
 
         public Task UploadPlayersBlobContent(string content)
             => UploadBlobContent("players.json", content);
+
+        public Task<string> DownloadGamesBlobContent(string playerID)
+            => DownloadBlobContent($"{playerID}.json");
+
+        public Task UploadGamesBlobContent(string playerID, string content)
+            => UploadBlobContent($"{playerID}.json", content);
     }
 }
