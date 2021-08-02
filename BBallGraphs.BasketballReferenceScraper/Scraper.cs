@@ -77,6 +77,11 @@ namespace BBallGraphs.BasketballReferenceScraper
                     if (!_profileUrlIDRegex.IsMatch(profileUrl))
                         throw new ScrapeException("Failed to parse player ID.", playerFeed.Url);
 
+                    // Work around a bugged repeated row for Tony Smith in the /s/ feed.
+                    if (profileUrl == "https://www.basketball-reference.com/players/s/smithto02.html"
+                        && string.IsNullOrEmpty(GetStatCell(playerRowCells, "height").TextContent))
+                        continue;
+
                     var player = new Player
                     {
                         ID = _profileUrlIDRegex.Match(profileUrl).Groups[1].Value,
