@@ -336,7 +336,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
             Assert.AreEqual(57, regularSeasonGames.Count());
             Assert.AreEqual(29, regularSeasonGames.Where(g => g.IsHomeGame).Count());
             Assert.AreEqual(300, regularSeasonGames.NullableSum(g => g.FieldGoalsMade));
-            Assert.AreEqual(54, regularSeasonGames.NullableSum(g => g.FieldGoalsAttempted));
+            Assert.AreEqual(122, regularSeasonGames.NullableSum(g => g.FieldGoalsAttempted));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.ThreePointersMade));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.ThreePointersAttempted));
             Assert.AreEqual(213, regularSeasonGames.NullableSum(g => g.FreeThrowsMade));
@@ -344,11 +344,11 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.OffensiveRebounds));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.DefensiveRebounds));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.TotalRebounds));
-            Assert.AreEqual(17, regularSeasonGames.NullableSum(g => g.Assists));
+            Assert.AreEqual(24, regularSeasonGames.NullableSum(g => g.Assists));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Steals));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Blocks));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.Turnovers));
-            Assert.AreEqual(8, regularSeasonGames.NullableSum(g => g.PersonalFouls));
+            Assert.AreEqual(21, regularSeasonGames.NullableSum(g => g.PersonalFouls));
             Assert.AreEqual(813, regularSeasonGames.NullableSum(g => g.Points));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.GameScore));
             Assert.AreEqual(null, regularSeasonGames.NullableSum(g => g.PlusMinus));

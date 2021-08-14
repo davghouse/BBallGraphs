@@ -7,6 +7,7 @@ using BBallGraphs.BasketballReferenceScraper.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -36,11 +37,16 @@ namespace BBallGraphs.BasketballReferenceScraper
 
         public virtual async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
         {
-            string playerFeedsUrl = "https://www.basketball-reference.com/players";
+            string playerFeedsUrl = "https://www.basketball-reference.com/players/";
 
             using (var browsingContext = GetBrowsingContext())
             using (var playerFeedsDocument = await browsingContext.OpenAsync(playerFeedsUrl))
             {
+                if (playerFeedsDocument.StatusCode != HttpStatusCode.OK)
+                    throw new ScrapeException($"Failed to scrape player feeds: status code {playerFeedsDocument.StatusCode}.", playerFeedsUrl);
+                if (playerFeedsDocument.Url != playerFeedsUrl)
+                    throw new ScrapeException($"Failed to scrape player feeds: redirected to {playerFeedsDocument.Url}.", playerFeedsUrl);
+
                 var playerFeeds = playerFeedsDocument
                     .QuerySelectorAll("ul.page_index li > a")
                     .OfType<IHtmlAnchorElement>()
@@ -49,10 +55,12 @@ namespace BBallGraphs.BasketballReferenceScraper
 
                 // The /x/ feed doesn't exist at the time of writing. Any other change to the feeds
                 // besides adding /x/ is unexpected and will require a code change to support.
-                if (playerFeeds.Length < 25 || playerFeeds.Length > 26
-                    || !playerFeeds.First().Url.EndsWith("/a/")
-                    || !playerFeeds.Last().Url.EndsWith("/z/"))
-                    throw new ScrapeException($"Failed to scrape player feeds.", playerFeedsUrl);
+                string errors = (playerFeeds.Length < 25 || playerFeeds.Length > 26 ? "Found an invalid number of feeds. " : null)
+                        + (!playerFeeds.First().Url.EndsWith("/a/") ? "Found a feed before the /a/ feed. " : null)
+                        + (!playerFeeds.Last().Url.EndsWith("/z/") ? "Found a feed after the /z/ feed. " : null);
+
+                if (!string.IsNullOrEmpty(errors))
+                    throw new ScrapeException($"Failed to scrape player feeds: {errors}", playerFeedsUrl);
 
                 return playerFeeds;
             }
@@ -63,6 +71,11 @@ namespace BBallGraphs.BasketballReferenceScraper
             using (var browsingContext = GetBrowsingContext())
             using (var playerFeedDocument = await browsingContext.OpenAsync(playerFeed.Url))
             {
+                if (playerFeedDocument.StatusCode != HttpStatusCode.OK)
+                    throw new ScrapeException($"Failed to scrape players: status code {playerFeedDocument.StatusCode}.", playerFeed.Url);
+                if (playerFeedDocument.Url != playerFeed.Url)
+                    throw new ScrapeException($"Failed to scrape players: redirected to {playerFeedDocument.Url}.", playerFeed.Url);
+
                 var players = new List<Player>();
 
                 foreach (var playerRow in playerFeedDocument
@@ -99,12 +112,14 @@ namespace BBallGraphs.BasketballReferenceScraper
                     players.Add(player);
                 }
 
-                if (players.Count == 0
-                    || players.Count != players.Select(p => p.ID).Distinct().Count()
-                    || players.Any(p => p.FirstSeason < 1947 || p.LastSeason > DateTime.UtcNow.Year + 1
-                        || p.HeightInInches < 12 || p.HeightInInches > 120
-                        || p.BirthDate < new DateTime(1900, 1, 1)))
-                    throw new ScrapeException("Failed to scrape players.", playerFeed.Url);
+                string errors = (players.Count == 0 ? "Found no players. " : null)
+                    + (players.Count != players.Select(p => p.ID).Distinct().Count() ? "Found multiple players with the same ID. " : null)
+                    + (players.Any(p => p.FirstSeason < 1947 || p.LastSeason > DateTime.UtcNow.Year + 1) ? "Found a player with an invalid season. " : null)
+                    + (players.Any(p => p.HeightInInches < 12 || p.HeightInInches > 120) ? "Found a player with an invalid height. " : null)
+                    + (players.Any(p => p.BirthDate < new DateTime(1900, 1, 1)) ? "Found a player with an invalid birth date. " : null);
+
+                if (!string.IsNullOrEmpty(errors))
+                    throw new ScrapeException($"Failed to scrape players: {errors}", playerFeed.Url);
 
                 return players;
             }
@@ -117,6 +132,11 @@ namespace BBallGraphs.BasketballReferenceScraper
             using (var browsingContext = GetBrowsingContext())
             using (var gameLogDocument = await browsingContext.OpenAsync(gameLogUrl))
             {
+                if (gameLogDocument.StatusCode != HttpStatusCode.OK)
+                    throw new ScrapeException($"Failed to scrape games: status code {gameLogDocument.StatusCode}.", gameLogUrl);
+                if (gameLogDocument.Url != gameLogUrl)
+                    throw new ScrapeException($"Failed to scrape games: redirected to {gameLogDocument.Url}.", gameLogUrl);
+
                 var regularSeasonGameRows = gameLogDocument
                     .QuerySelectorAll("table#pgl_basic tbody tr[id^='pgl_basic.']");
                 // The playoffs game log data comes embedded in an HTML comment on the page. There's some
