@@ -183,7 +183,9 @@ namespace BBallGraphs.BasketballReferenceScraper
                         // This guy randomly played one game on a different team, not really sure what's going on here.
                         || player.ID == "johnsne01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/195111220NYK.html"
                         // This guy switched teams but then randomly played a game for his old team on the same day as playing for his new team.
-                        || player.ID == "rotheir01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194801080STB.html")
+                        || player.ID == "rotheir01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/194801080STB.html"
+                        // Game protested and completed at a later date once Marion had joined the team.
+                        || player.ID == "mariosh01" && game.BoxScoreUrl == "https://www.basketball-reference.com/boxscores/200712190ATL.html")
                     {
                         game.ID = $"{game.ID} 2";
                         game.Date = game.Date.AddHours(3);
