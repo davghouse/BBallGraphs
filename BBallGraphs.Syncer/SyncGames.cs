@@ -13,8 +13,9 @@ namespace BBallGraphs.Syncer
     {
         [FunctionName(nameof(SyncGames))]
         public static async Task Run(
-            // Every 3 minutes, between 8:00 PM and 7:59 AM every day. Trying to go very easy on them.
-            [TimerTrigger("0 */3 0-7,20-23 * * *")]TimerInfo timer,
+            // Every 3 minutes, between 7:00 PM and 7:59 AM every day except from 4 AM to 5 AM
+            // when site maintenance might be happening. Trying to go very easy on them.
+            [TimerTrigger("0 */3 0-3,5-7,19-23 * * *")]TimerInfo timer,
             ILogger log)
         {
             var tableService = new TableService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
