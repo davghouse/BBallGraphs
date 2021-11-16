@@ -23,7 +23,7 @@ namespace BBallGraphs.BasketballReferenceScraper
 
         public string UserAgent { get; set; }
 
-        protected virtual IBrowsingContext GetBrowsingContext()
+        protected IBrowsingContext GetBrowsingContext()
         {
             var requester = new DefaultHttpRequester();
             requester.Headers["User-Agent"] = UserAgent;
@@ -35,7 +35,7 @@ namespace BBallGraphs.BasketballReferenceScraper
         protected static IElement GetStatCell(IEnumerable<IElement> rowCells, string statAttributeValue)
             => rowCells.SingleOrDefault(c => c.GetAttribute("data-stat") == statAttributeValue);
 
-        public virtual async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
+        public async Task<IReadOnlyList<PlayerFeed>> GetPlayerFeeds()
         {
             string playerFeedsUrl = "https://www.basketball-reference.com/players/";
 
@@ -66,7 +66,7 @@ namespace BBallGraphs.BasketballReferenceScraper
             }
         }
 
-        public virtual async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
+        public async Task<IReadOnlyList<Player>> GetPlayers(IPlayerFeed playerFeed)
         {
             using (var browsingContext = GetBrowsingContext())
             using (var playerFeedDocument = await browsingContext.OpenAsync(playerFeed.Url))
@@ -125,7 +125,7 @@ namespace BBallGraphs.BasketballReferenceScraper
             }
         }
 
-        public virtual async Task<IReadOnlyList<Game>> GetGames(IPlayer player, int season)
+        public async Task<IReadOnlyList<Game>> GetGames(IPlayer player, int season)
         {
             string gameLogUrl = player.GetGameLogUrl(season);
 
