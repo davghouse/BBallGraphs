@@ -44,6 +44,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Helpers
                 case "R.B. Lynam": return new DateTime(1944, 1, 1).AsUtc();
                 case "Dick Lee": return new DateTime(1938, 1, 1).AsUtc();
                 case "Richard Moore": return new DateTime(1945, 1, 1).AsUtc();
+                case "Richie Moore": return new DateTime(1945, 1, 1).AsUtc();
                 case "Larry Moore": return new DateTime(1944, 1, 1).AsUtc();
                 case "Howie McCarty": return new DateTime(1919, 1, 1).AsUtc();
                 case "Charles Parks": return new DateTime(1946, 1, 1).AsUtc();

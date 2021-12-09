@@ -479,32 +479,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
         }
 
         [TestMethod]
-        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay_1()
-        {
-            var scraper = new Scraper(_transparentUserAgent);
-            var player = new Player
-            {
-                ID = "fitzgbo01",
-                FeedUrl = "https://www.basketball-reference.com/players/f/",
-                Name = "Bob Fitzgerald",
-                FirstSeason = 1947,
-                LastSeason = 1949,
-                BirthDate = new DateTime(1923, 3, 14).AsUtc()
-            };
-
-            var games = await scraper.GetGames(player, 1947);
-            var regularSeasonGames = games.Where(g => !g.IsPlayoffGame);
-            var playoffGames = games.Where(g => g.IsPlayoffGame);
-
-            Assert.AreEqual(62, regularSeasonGames.Count());
-            Assert.AreEqual(5, playoffGames.Count());
-            Assert.AreEqual(33, regularSeasonGames.Where(g => g.Team == "TRH").Count());
-            Assert.AreEqual(29, regularSeasonGames.Where(g => g.Team == "NYK").Count());
-            Assert.AreEqual(5, playoffGames.Where(g => g.Team == "NYK").Count());
-        }
-
-        [TestMethod]
-        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay_2()
+        public async Task GetGamesForAPlayerWhoPlayedOnTwoDifferentTeamsInTheSameDay()
         {
             var scraper = new Scraper(_transparentUserAgent);
             var player = new Player
