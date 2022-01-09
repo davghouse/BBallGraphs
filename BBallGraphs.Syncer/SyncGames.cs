@@ -41,11 +41,14 @@ namespace BBallGraphs.Syncer
                 throw new SyncException("Defunct game rows found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctGameRows.Select(r => r.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
-            // Games from the current season get updated relatively frequently. For safety, manually verify older updates.
+            // Games from the current season get updated relatively frequently. For safety, manually verify
+            // older updates. Except for plus-minus, which seems to be getting backfilled a bit right now.
             if (syncResult.UpdatedGameRows.Any(r => r.Season < DateTime.UtcNow.Year)
+                && (syncResult.UpdatedFields.Count > 1 || !syncResult.UpdatedFields.Contains(nameof(IGame.PlusMinus)))
                 && !bool.Parse(Environment.GetEnvironmentVariable("AllowUpdatedHistoricalGameRows")))
                 throw new SyncException($"Updated historical game rows found, manual intervention required: " +
-                    $"{string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}", playerRow.GetGameLogUrl(syncSeason));
+                    $"{string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}{Environment.NewLine}" +
+                    $"Updated fields: {string.Join(", ", syncResult.UpdatedFields)}", playerRow.GetGameLogUrl(syncSeason));
 
             log.LogInformation(syncResult.DefunctGameRows.Any()
                 ? $"Defunct games found for {playerRow.Name}'s {syncSeason} season: {string.Join(", ", syncResult.DefunctGameRows.Select(r => r.ID))}"

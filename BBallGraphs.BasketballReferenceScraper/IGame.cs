@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BBallGraphs.BasketballReferenceScraper
 {
@@ -105,6 +106,41 @@ namespace BBallGraphs.BasketballReferenceScraper
             targetGame.Points = sourceGame.Points;
             targetGame.GameScore = sourceGame.GameScore;
             targetGame.PlusMinus = sourceGame.PlusMinus;
+        }
+
+        public static IEnumerable<string> GetUpdatedFields(this IGame sourceGame, IGame targetGame)
+        {
+            if (sourceGame.ID != targetGame.ID) yield return nameof(IGame.ID);
+            if (sourceGame.PlayerID != targetGame.PlayerID) yield return nameof(IGame.PlayerID);
+            if (sourceGame.PlayerName != targetGame.PlayerName) yield return nameof(IGame.PlayerName);
+            if (sourceGame.Season != targetGame.Season) yield return nameof(IGame.Season);
+            if (sourceGame.Date != targetGame.Date) yield return nameof(IGame.Date);
+            if (sourceGame.Team != targetGame.Team) yield return nameof(IGame.Team);
+            if (sourceGame.OpponentTeam != targetGame.OpponentTeam) yield return nameof(IGame.OpponentTeam);
+            if (sourceGame.IsHomeGame != targetGame.IsHomeGame) yield return nameof(IGame.IsHomeGame);
+            if (sourceGame.IsPlayoffGame != targetGame.IsPlayoffGame) yield return nameof(IGame.IsPlayoffGame);
+            if (sourceGame.BoxScoreUrl != targetGame.BoxScoreUrl) yield return nameof(IGame.BoxScoreUrl);
+            if (sourceGame.AgeInDays != targetGame.AgeInDays) yield return nameof(IGame.AgeInDays);
+            if (sourceGame.Won != targetGame.Won) yield return nameof(IGame.Won);
+            if (sourceGame.Started != targetGame.Started) yield return nameof(IGame.Started);
+            if (sourceGame.SecondsPlayed != targetGame.SecondsPlayed) yield return nameof(IGame.SecondsPlayed);
+            if (sourceGame.FieldGoalsMade != targetGame.FieldGoalsMade) yield return nameof(IGame.FieldGoalsMade);
+            if (sourceGame.FieldGoalsAttempted != targetGame.FieldGoalsAttempted) yield return nameof(IGame.FieldGoalsAttempted);
+            if (sourceGame.ThreePointersMade != targetGame.ThreePointersMade) yield return nameof(IGame.ThreePointersMade);
+            if (sourceGame.ThreePointersAttempted != targetGame.ThreePointersAttempted) yield return nameof(IGame.ThreePointersAttempted);
+            if (sourceGame.FreeThrowsMade != targetGame.FreeThrowsMade) yield return nameof(IGame.FreeThrowsMade);
+            if (sourceGame.FreeThrowsAttempted != targetGame.FreeThrowsAttempted) yield return nameof(IGame.FreeThrowsAttempted);
+            if (sourceGame.OffensiveRebounds != targetGame.OffensiveRebounds) yield return nameof(IGame.OffensiveRebounds);
+            if (sourceGame.DefensiveRebounds != targetGame.DefensiveRebounds) yield return nameof(IGame.DefensiveRebounds);
+            if (sourceGame.TotalRebounds != targetGame.TotalRebounds) yield return nameof(IGame.TotalRebounds);
+            if (sourceGame.Assists != targetGame.Assists) yield return nameof(IGame.Assists);
+            if (sourceGame.Steals != targetGame.Steals) yield return nameof(IGame.Steals);
+            if (sourceGame.Blocks != targetGame.Blocks) yield return nameof(IGame.Blocks);
+            if (sourceGame.Turnovers != targetGame.Turnovers) yield return nameof(IGame.Turnovers);
+            if (sourceGame.PersonalFouls != targetGame.PersonalFouls) yield return nameof(IGame.PersonalFouls);
+            if (sourceGame.Points != targetGame.Points) yield return nameof(IGame.Points);
+            if (sourceGame.GameScore != targetGame.GameScore) yield return nameof(IGame.GameScore);
+            if (sourceGame.PlusMinus != targetGame.PlusMinus) yield return nameof(IGame.PlusMinus);
         }
     }
 }

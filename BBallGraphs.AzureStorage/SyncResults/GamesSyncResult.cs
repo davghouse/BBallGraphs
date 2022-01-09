@@ -20,6 +20,7 @@ namespace BBallGraphs.AzureStorage.SyncResults
             NewGameRows = GameRow.CreateRows(gamesByID.Values
                 .Where(g => !gameRowsByID.ContainsKey(g.ID)))
                 .ToArray();
+            UpdatedFields = new HashSet<string>();
 
             var updatedGameRows = new List<GameRow>();
             foreach (var game in gamesByID.Values)
@@ -27,6 +28,7 @@ namespace BBallGraphs.AzureStorage.SyncResults
                 if (gameRowsByID.TryGetValue(game.ID, out GameRow gameRow)
                     && !game.Matches(gameRow))
                 {
+                    UpdatedFields.UnionWith(game.GetUpdatedFields(gameRow));
                     game.CopyTo(gameRow);
                     updatedGameRows.Add(gameRow);
                 }
@@ -37,6 +39,7 @@ namespace BBallGraphs.AzureStorage.SyncResults
         public IReadOnlyList<GameRow> DefunctGameRows { get; }
         public IReadOnlyList<GameRow> NewGameRows { get; }
         public IReadOnlyList<GameRow> UpdatedGameRows { get; }
+        public HashSet<string> UpdatedFields { get; }
 
         public bool FoundChanges
             => DefunctGameRows.Any() || NewGameRows.Any() || UpdatedGameRows.Any();
