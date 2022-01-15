@@ -10,7 +10,7 @@ namespace BBallGraphs.BasketballReferenceScraper
         public int FirstSeason { get; set; }
         public int LastSeason { get; set; }
         public string Position { get; set; }
-        public double HeightInInches { get; set; }
+        public double? HeightInInches { get; set; }
         public double? WeightInPounds { get; set; }
         public DateTime BirthDate { get; set; }
 

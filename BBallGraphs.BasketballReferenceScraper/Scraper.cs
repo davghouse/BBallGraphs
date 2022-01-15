@@ -103,11 +103,11 @@ namespace BBallGraphs.BasketballReferenceScraper
                         FirstSeason = int.Parse(GetStatCell(playerRowCells, "year_min").TextContent),
                         LastSeason = int.Parse(GetStatCell(playerRowCells, "year_max").TextContent),
                         Position = GetStatCell(playerRowCells, "pos").TextContent.Trim(),
-                        HeightInInches = ScrapeHelper.ParseHeightInInches(GetStatCell(playerRowCells, "height").TextContent),
-                        WeightInPounds = NullableHelper.TryParseDouble(GetStatCell(playerRowCells, "weight").TextContent),
+                        HeightInInches = ParseHelper.ParseNullableHeightInInches(GetStatCell(playerRowCells, "height").TextContent),
+                        WeightInPounds = ParseHelper.ParseNullableDouble(GetStatCell(playerRowCells, "weight").TextContent),
                     };
-                    player.BirthDate = DateTime.TryParse(GetStatCell(playerRowCells, "birth_date").TextContent, out DateTime birthDate)
-                        ? birthDate.AsUtc() : ScrapeHelper.GetEstimatedBirthDate(player.Name);
+                    player.BirthDate = ParseHelper.ParseNullableDateTime(GetStatCell(playerRowCells, "birth_date").TextContent)?.AsUtc()
+                        ?? ScrapeHelper.GetEstimatedBirthDate(player.Name);
 
                     players.Add(player);
                 }
@@ -171,27 +171,27 @@ namespace BBallGraphs.BasketballReferenceScraper
                         Won =  GetStatCell(gameRowCells, "game_result").TextContent.Contains("W"),
                         Started = string.IsNullOrWhiteSpace(GetStatCell(gameRowCells, "gs").TextContent) ? null
                             : (bool?)GetStatCell(gameRowCells, "gs").TextContent.Contains("1"),
-                        SecondsPlayed = ScrapeHelper.ParseSecondsPlayed(GetStatCell(gameRowCells, "mp").TextContent),
-                        FieldGoalsMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg").TextContent),
-                        FieldGoalsAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fga").TextContent),
-                        ThreePointersMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg3")?.TextContent),
-                        ThreePointersAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fg3a")?.TextContent),
-                        FreeThrowsMade = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "ft").TextContent),
-                        FreeThrowsAttempted = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "fta").TextContent),
-                        OffensiveRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "orb")?.TextContent),
-                        DefensiveRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "drb")?.TextContent),
-                        TotalRebounds = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "trb").TextContent),
-                        Assists = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "ast").TextContent),
-                        Steals = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "stl")?.TextContent),
-                        Blocks = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "blk")?.TextContent),
-                        Turnovers = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "tov")?.TextContent),
-                        PersonalFouls = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "pf").TextContent),
+                        SecondsPlayed = ParseHelper.ParseNullableSecondsPlayed(GetStatCell(gameRowCells, "mp").TextContent),
+                        FieldGoalsMade = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "fg").TextContent),
+                        FieldGoalsAttempted = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "fga").TextContent),
+                        ThreePointersMade = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "fg3")?.TextContent),
+                        ThreePointersAttempted = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "fg3a")?.TextContent),
+                        FreeThrowsMade = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "ft").TextContent),
+                        FreeThrowsAttempted = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "fta").TextContent),
+                        OffensiveRebounds = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "orb")?.TextContent),
+                        DefensiveRebounds = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "drb")?.TextContent),
+                        TotalRebounds = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "trb").TextContent),
+                        Assists = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "ast").TextContent),
+                        Steals = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "stl")?.TextContent),
+                        Blocks = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "blk")?.TextContent),
+                        Turnovers = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "tov")?.TextContent),
+                        PersonalFouls = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "pf").TextContent),
                         // Points is almost always filled in with 0 if the player didn't score in a game. Going to assume
                         // the rare exceptions where points is left blank are just meaningless inconsistencies in how bball
                         // ref displays 0, rather than true nulls that indicate missing data (like for steals & blocks).
-                        Points = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "pts").TextContent) ?? 0,
-                        GameScore = NullableHelper.TryParseDouble(GetStatCell(gameRowCells, "game_score")?.TextContent),
-                        PlusMinus = NullableHelper.TryParseInt(GetStatCell(gameRowCells, "plus_minus")?.TextContent)
+                        Points = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "pts").TextContent) ?? 0,
+                        GameScore = ParseHelper.ParseNullableDouble(GetStatCell(gameRowCells, "game_score")?.TextContent),
+                        PlusMinus = ParseHelper.ParseNullableInt(GetStatCell(gameRowCells, "plus_minus")?.TextContent)
                     };
                     game.ID = $"{player.ID} {game.Date:d}";
                     game.AgeInDays = (int)(game.Date - player.BirthDate).TotalDays;

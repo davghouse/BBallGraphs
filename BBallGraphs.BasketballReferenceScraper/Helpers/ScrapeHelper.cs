@@ -4,29 +4,6 @@ namespace BBallGraphs.BasketballReferenceScraper.Helpers
 {
     public static class ScrapeHelper
     {
-        public static double ParseHeightInInches(string height)
-        {
-            if (!height.Contains("-"))
-                throw new ArgumentException("Height in an unrecognized format, no separating dash.", nameof(height));
-
-            string[] parts = height.Split('-');
-
-            return int.Parse(parts[0]) * 12 + double.Parse(parts[1]);
-        }
-
-        public static int? ParseSecondsPlayed(string playedTime)
-        {
-            if (string.IsNullOrWhiteSpace(playedTime))
-                return null;
-
-            if (!playedTime.Contains(":"))
-                throw new ArgumentException("Played time in an unrecognized format, no separating colon.", nameof(playedTime));
-
-            string[] parts = playedTime.Split(':');
-
-            return int.Parse(parts[0]) * 60 + int.Parse(parts[1]);
-        }
-
         // Some old players only have birth years listed, in which case January 1st of that year is
         // assumed. One guy (Dick Lee) doesn't even have a year I can find, so I just made something up.
         public static DateTime GetEstimatedBirthDate(string playerName)
@@ -57,6 +34,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Helpers
                 case "Jim Wilson": return new DateTime(1948, 1, 1).AsUtc();
                 case "Bobby Wilson": return new DateTime(1944, 1, 1).AsUtc();
                 case "Dexter Westbrook": return new DateTime(1943, 1, 1).AsUtc();
+                case "Craig Sword": return new DateTime(1994, 1, 16).AsUtc();
                 default: throw new NotImplementedException($"{playerName} doesn't have an estimated birth date.");
             }
         }
