@@ -14,7 +14,7 @@ namespace BBallGraphs.Syncer
         [FunctionName(nameof(SyncGames))]
         public static async Task Run(
             // Every 3 minutes, between 7:00 PM and 7:59 AM every day except from 4 AM to 5 AM
-            // when site maintenance might be happening. Trying to go very easy on them.
+            // when site maintenance seems like it might be happening. Trying to go very easy on them.
             [TimerTrigger("0 */3 0-3,5-7,19-23 * * *")]TimerInfo timer,
             ILogger log)
         {

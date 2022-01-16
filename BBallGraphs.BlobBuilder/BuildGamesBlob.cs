@@ -13,8 +13,9 @@ namespace BBallGraphs.BlobBuilder
     {
         [FunctionName(nameof(BuildGamesBlob))]
         public static async Task Run(
-            // At 20 seconds past the minute every 3 minutes, between 8:00 PM and 7:59 AM every day--matching SyncGames.
-            [TimerTrigger("20 */3 0-7,20-23 * * *")]TimerInfo timer,
+            // At 20 seconds past the minute every 3 minutes, between 7:00 PM and 7:59 AM every day except
+            // from 4 AM to 5 AM when site maintenance seems like it might be happening--matching SyncGames.
+            [TimerTrigger("20 */3 0-3,5-7,19-23 * * *")]TimerInfo timer,
             ILogger log)
         {
             var queueService = new QueueService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
