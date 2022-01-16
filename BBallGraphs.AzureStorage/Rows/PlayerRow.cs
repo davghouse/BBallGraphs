@@ -59,7 +59,7 @@ namespace BBallGraphs.AzureStorage.Rows
             // players more and more the longer they've gone without a changing sync.
             var lastSyncWithChangesTimeUtc = syncFoundChanges ? syncTimeUtc : LastSyncWithChangesTimeUtc;
             var prioritizedRowKeyTimeUtc = syncSeason == LastSeason && this.IsProbablyRetired()
-                ? syncTimeUtc.AddDays((syncTimeUtc - (lastSyncWithChangesTimeUtc ?? syncTimeUtc)).TotalDays / 2 + 365)
+                ? syncTimeUtc.AddDays((syncTimeUtc - (lastSyncWithChangesTimeUtc ?? syncTimeUtc)).TotalDays / 4 + 180)
                 : syncTimeUtc;
 
             var requeuedPlayerRow = CreateRow(this, prioritizedRowKeyTimeUtc);
