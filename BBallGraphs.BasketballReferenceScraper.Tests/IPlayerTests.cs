@@ -111,7 +111,7 @@ namespace BBallGraphs.BasketballReferenceScraper.Tests
             };
 
             Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01.html", player.GetProfileUrl());
-            Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01/gamelog/2007/", player.GetGameLogUrl(2007));
+            Assert.AreEqual("https://www.basketball-reference.com/players/j/jamesle01/gamelog/2007", player.GetGameLogUrl(2007));
         }
 
         [TestMethod]
