@@ -36,17 +36,17 @@ namespace BBallGraphs.Syncer
 
             var syncResult = new GamesSyncResult(gameRows, games);
 
-            if (syncResult.DefunctGameRows.Any()
-                && !bool.Parse(Environment.GetEnvironmentVariable("AllowDefunctGameRows")))
-                throw new SyncException("Defunct game rows found, manual intervention required: " +
+            if (syncResult.DefunctGameRows.Count() > gameRows.Count() / 2
+                && !bool.Parse(Environment.GetEnvironmentVariable("AllowDefunctGameRowsMajority")))
+                throw new SyncException("Defunct game rows majority found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.DefunctGameRows.Select(r => r.ID))}", playerRow.GetGameLogUrl(syncSeason));
 
             // Games from the current season get updated relatively frequently. For safety, manually verify
-            // older updates. Except for plus-minus, which seems to be getting backfilled a bit right now.
-            if (syncResult.UpdatedGameRows.Any(r => r.Season < DateTime.UtcNow.Year)
+            // some older updates. Except for plus-minus, which seems to be getting backfilled a bit right now.
+            if (syncResult.UpdatedGameRows.Count(r => r.Season < DateTime.UtcNow.Year) > games.Count() / 2
                 && (syncResult.UpdatedFields.Count > 1 || !syncResult.UpdatedFields.Contains(nameof(IGame.PlusMinus)))
-                && !bool.Parse(Environment.GetEnvironmentVariable("AllowUpdatedHistoricalGameRows")))
-                throw new SyncException($"Updated historical game rows found, manual intervention required: " +
+                && !bool.Parse(Environment.GetEnvironmentVariable("AllowUpdatedHistoricalGameRowsMajority")))
+                throw new SyncException($"Updated historical game rows majority found, manual intervention required: " +
                     $"{string.Join(", ", syncResult.UpdatedGameRows.Select(r => r.ID))}{Environment.NewLine}" +
                     $"Updated fields: {string.Join(", ", syncResult.UpdatedFields)}", playerRow.GetGameLogUrl(syncSeason));
 
