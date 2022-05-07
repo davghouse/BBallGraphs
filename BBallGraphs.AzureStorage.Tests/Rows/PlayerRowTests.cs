@@ -168,7 +168,7 @@ namespace BBallGraphs.AzureStorage.Tests.Rows
             Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncTimeUtc);
             Assert.AreEqual(utcNow.AddTicks(10), playerRow.LastSyncWithChangesTimeUtc);
             // Deprioritized due to being retired.
-            Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(10).AddDays(365)), playerRow.RowKey);
+            Assert.AreEqual(PlayerRow.GetRowKey(utcNow.AddTicks(10).AddDays(180)), playerRow.RowKey);
         }
     }
 }
